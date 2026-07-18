@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue - AXIS STORE</title>
+    
+    <!-- Balises Open Graph pour l'aperçu WhatsApp -->
+    <meta property="og:title" content="AXIS Footwear | L'Axe de la Performance" />
+    <meta property="og:url" content="https://axis-store-one.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="Votre boutique de chaussures de performance." />
+    <meta property="og:image" content="https://axis-store-one.vercel.app/mon-image.jpg" />
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -156,7 +164,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="index.html">Accueil</a></li>
+                <li><a href="axis-store acceuil.html">Accueil</a></li>
                 <li><a href="#cart-section" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -351,29 +359,23 @@
             });
         }
 
-        // --- MISE À JOUR DE LA FONCTION : MODIFIER IMAGE & QUALITÉ ---
         window.quickEditProduct = function(productId) {
             const prod = window.productsData.find(p => p.id === productId);
             if (!prod) return;
 
-            // 1. Nom
             const newName = prompt(`Modifier le NOM du produit (ID: ${prod.id}) :`, prod.name);
             if (newName === null) return;
 
-            // 2. Prix
             const newPriceStr = prompt(`Modifier le PRIX DE BASE en FCFA (Actuel: ${prod.price}) :`, prod.price);
             if (newPriceStr === null) return;
             const newPrice = parseInt(newPriceStr) || 0;
 
-            // 3. Badge
             const newBadge = prompt(`Modifier le BADGE (Actuel: ${prod.badge}) :`, prod.badge);
             if (newBadge === null) return;
 
-            // 4. Image (URL)
             const newImage = prompt(`Modifier le LIEN DE L'IMAGE / URL (Actuel: ${prod.image}) :`, prod.image);
             if (newImage === null) return;
 
-            // 5. Qualité / Matériau par défaut
             const currentType = prod.qualityType || 'coton';
             const newQualityType = prompt(`Modifier la QUALITÉ globale par défaut de la carte.\nTapez 'coton' ou 'nylon' :`, currentType).trim().toLowerCase();
             if (newQualityType !== 'coton' && newQualityType !== 'nylon') {
@@ -381,7 +383,6 @@
                 return;
             }
 
-            // Sauvegarde directe des modifications sur Firebase pour la carte ciblée
             update(ref(db, `products/prod_${productId}`), {
                 name: newName,
                 price: newPrice,
@@ -389,7 +390,7 @@
                 image: newImage,
                 qualityType: newQualityType
             }).then(() => {
-                alert(`L'article #${productId} (Image & Qualité incluses) a été mis à jour avec succès !`);
+                alert(`L'article #${productId} a été mis à jour avec succès !`);
             });
         }
 
