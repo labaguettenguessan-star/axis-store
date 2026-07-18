@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue - AXIS STORE</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            line-height: 1.5; 
+            color: #333; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #101010; 
+            font-size: 16px;
+            padding-top: 90px; /* Évite que le header fixe ne cache le contenu */
+        }
+        h1 { text-align: center; color: #39ff14; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: right; margin-bottom: 2px; order: 2; }
+        .logo span { color: #39ff14; }
+        
+        /* Header Fixe et Fluide */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #070707; 
+            color: #fff; 
+            padding: 15px 20px; 
+            margin-bottom: 20px; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-sizing: border-box;
+            border-bottom: 1px solid #222;
+        }
+        nav { order: 1; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
+        nav a:hover { color: #39ff14; }
+
+        /* Version téléphone mobile */
+        @media (max-width: 768px) {
+            header { padding: 12px; }
+            header nav { width: 100%; }
+            header nav ul { display: flex; justify-content: space-around; width: 100%; padding: 0; margin: 0; list-style: none; gap: 10px; }
+            header nav ul li a { font-size: 13px; padding: 5px 5px; }
+            .logo { display: none; } /* Cache le logo sur mini écrans pour laisser la place au menu */
+        }
+
+        .main-container { display: flex; flex-direction: column; gap: 25px; }
+
+        /* Catalogue */
+        .catalog-container { flex: 3; }
+        .catalog-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+        }
+        
+        .product-card { 
+            border: 1px solid #222; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            background: #fff; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-3px); }
+        
+        .image-container { position: relative; width: 100%; height: 240px; background: #f9f9f9; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .badge-expert { position: absolute; top: 10px; left: 10px; background: #e67e22; color: white; font-size: 0.75em; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        
+        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        .brand { font-size: 0.8em; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 1px; }
+        .model-name { font-size: 1.1em; font-weight: bold; color: #111; }
+        .price { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .expert-note { background: #f9f9f9; padding: 10px; border-left: 3px solid #111; font-size: 0.85em; color: #555; border-radius: 0 4px 4px 0; }
+        
+        /* Options (Taille & Qualité) */
+        .options-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
+        .option-group { display: flex; flex-direction: column; gap: 4px; }
+        .option-group label { font-size: 0.8em; font-weight: bold; color: #555; }
+        .option-select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9em; background: #fff; width: 100%; cursor: pointer; }
+
+        .btn-add { display: block; text-align: center; background: #111; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.9em; margin-top: auto; cursor: pointer; transition: background 0.2s; width: 100%; }
+        .btn-add:hover { background: #333; }
+
+        /* Panier */
+        .cart-container { flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; height: max-content; position: sticky; top: 100px; }
+        .cart-container h2 { font-size: 1.3em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #111; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.95em; }
+        .cart-item-detail { display: flex; align-items: center; gap: 8px; }
+        .cart-item-meta { font-size: 0.8em; color: #666; display: block; margin-top: 2px; }
+        .btn-remove { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; }
+        .cart-total { font-size: 1.2em; font-weight: bold; margin-top: 15px; text-align: right; color: #111; }
+        
+        .form-group { margin-top: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.85em; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+
+        .cart-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
+        .btn-order:hover { background: #128c7e; }
+        .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; }
+
+        /* Zone Connexion / Admin Privée */
+        .admin-trigger-zone { text-align: center; margin-top: 60px; padding: 20px 0; border-top: 1px dashed #333; }
+        .btn-admin-login { background: none; border: none; color: #666; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
+        
+        .admin-panel { display: none; background: #1a1a1a; color: #fff; padding: 30px; border-radius: 10px; margin-top: 30px; border: 2px solid #39ff14; }
+        .admin-panel h2 { color: #39ff14; margin-bottom: 20px; font-size: 1.4rem; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; color: #fff; font-size: 0.85rem; }
+        .admin-table th, .admin-table td { padding: 10px; border: 1px solid #333; text-align: left; vertical-align: middle; }
+        .admin-table th { background: #222; color: #39ff14; }
+        .admin-table input, .admin-table select { background: #2b2b2b; color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 100%; }
+        .admin-supp-box { margin-top: 5px; display: flex; gap: 5px; flex-direction: column; font-size: 0.75rem; }
+        .admin-supp-box div { display: flex; align-items: center; justify-content: space-between; }
+        .admin-supp-box input { width: 70px; padding: 2px; }
+        
+        .btn-save-admin { background: #39ff14; color: #000; border: none; padding: 12px 25px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.95rem; }
+        .btn-save-admin:hover { background: #2bdc0f; }
+
+        footer { text-align: center; padding: 20px; margin-top: 40px; color: #666; border-top: 1px solid #222; }
+
+        @media (min-width: 768px) { body { font-size: 18px; } }
+        @media (min-width: 1024px) { 
+            body { font-size: 20px; } 
+            .main-container { flex-direction: row; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="#cart-section" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
+                <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="logo">AXIS <span>STORE</span></div>
+    </header>
+
+    <h1>NOTRE CATALOGUE</h1>
+    <p class="subtitle">Revendeur officiel.</p>
+
+    <div class="main-container">
+        <!-- Grille Articles -->
+        <div class="catalog-container">
+            <div class="catalog-grid" id="catalog-products">
+                <!-- Les 30 produits s'injectent dynamiquement ici -->
+            </div>
+        </div>
+
+        <!-- Panier Dynamique -->
+        <div id="cart-section" class="cart-container">
+            <h2>Mon Panier (<span id="cart-count">0</span>)</h2>
+            <div id="cart-items" style="margin-top: 15px;">
+                <p style="color: #888; font-style: italic;">Votre panier est vide.</p>
+            </div>
+            <div class="cart-total">Total: <span id="cart-total">0</span> FCFA</div>
+
+            <div class="form-group">
+                <label for="client-name">Votre Nom :</label>
+                <input type="text" id="client-name" placeholder="Ex: Jean punk">
+            </div>
+            <div class="form-group">
+                <label for="client-delivery">Adresse de livraison :</label>
+                <input type="text" id="client-delivery" placeholder="Ex: Abidjan, Cocody">
+            </div>
+
+            <div class="cart-actions">
+                <button class="btn-cancel" onclick="clearCart()">Décommander</button>
+                <button class="btn-order" onclick="sendOrder()">Commander</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Espace Privé Administrateur Déclencheur -->
+    <div class="admin-trigger-zone">
+        <button class="btn-admin-login" onclick="loginAdmin()">🔑 Accéder à l'espace de gestion (Privé)</button>
+    </div>
+
+    <!-- Panneau d'administration -->
+    <div class="admin-panel" id="admin-panel">
+        <h2>PANNEAU DE GESTION DES ARTICLES (AXIS STORE)</h2>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 20%;">Nom du modèle</th>
+                        <th style="width: 25%;">Lien Photo (URL)</th>
+                        <th style="width: 15%;">Prix de Base (FCFA)</th>
+                        <th style="width: 15%;">Type Matériau</th>
+                        <th style="width: 20%;">Suppléments Qualité (FCFA)</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                    <!-- Généré dynamiquement pour modification -->
+                </tbody>
+            </table>
+        </div>
+        <button class="btn-save-admin" onclick="saveAdminChanges()">ENREGISTRER LES MODIFICATIONS</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
+    </footer>
+
+    <script>
+        const MERCHANT_NUMBER = "2250720648060"; 
+        const ADMIN_PASSWORD = "LBG@.COM"; 
+        
+        let cart = [];
+        let productsData = [];
+
+        function initProductsData() {
+            const savedData = localStorage.getItem('axis_store_products_v2');
+            if (savedData) {
+                productsData = JSON.parse(savedData);
+            } else {
+                const baseProducts = [
+                    { id: 1, name: "Ensemble Coton Premium Axis", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+                    { id: 2, name: "Short Nylon Léger Jogger", price: 12000, type: "nylon", cat: "Sportline", badge: "Top Vente", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+                    { id: 3, name: "Chaussure Axis Track v1", price: 35000, type: "coton", cat: "Luxe & Tradition", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" }
+                ];
+
+                productsData = [];
+                
+                for (let i = 1; i <= 30; i++) {
+                    const template = baseProducts[(i - 1) % baseProducts.length];
+                    productsData.push({
+                        id: i,
+                        badge: i <= 3 ? template.badge : "Disponible",
+                        category: template.cat,
+                        name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
+                        price: template.price,
+                        image: template.image,
+                        qualityType: template.type,
+                        suppCoton: 0,
+                        suppNylon: template.type === "nylon" ? 2000 : 3000
+                    });
+                }
+                localStorage.setItem('axis_store_products_v2', JSON.stringify(productsData));
+            }
+        }
+                  
+        function renderCatalog() {
+            const catalogContainer = document.getElementById('catalog-products');
+            catalogContainer.innerHTML = "";
+
+            productsData.forEach(prod => {
+                const sc = prod.suppCoton || 0;
+                const sn = prod.suppNylon || 0;
+
+                let qualityOptionsHtml = '';
+                if(prod.qualityType === "nylon") {
+                    qualityOptionsHtml = `
+                        <option value="Coton Standard" data-extra="${sc}">Coton Classique (+${sc} FCFA)</option>
+                        <option value="Nylon Premium" data-extra="${sn}" selected>Nylon Premium (+${sn} FCFA)</option>
+                    `;
+                } else {
+                    qualityOptionsHtml = `
+                        <option value="Coton Standard" data-extra="${sc}" selected>Coton Classique (+${sc} FCFA)</option>
+                        <option value="Nylon Standard" data-extra="${sn}">Nylon Basique (+${sn} FCFA)</option>
+                    `;
+                }
+
+                const defaultExtra = prod.qualityType === "nylon" ? sn : sc;
+                const initialDisplayedPrice = prod.price + defaultExtra;
+                
+                const safeName = prod.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                catalogContainer.innerHTML += `
+                    <div class="product-card">
+                        <div class="image-container">
+                            <span class="badge-expert">${prod.badge}</span>
+                            <img src="${prod.image}" alt="${prod.name}">
+                        </div>
+                        <div class="product-info">
+                            <span class="brand">${prod.category}</span>
+                            <div class="model-name">${prod.name}</div>
+                            <div class="price" id="display-price-${prod.id}">${initialDisplayedPrice.toLocaleString()} FCFA</div>
+                            <div class="expert-note"><strong>Avis Revendeur :</strong> test produit de qualité supérieure.</div>
+                            
+                            <div class="options-container">
+                                <div class="option-group">
+                                    <label for="size-${prod.id}">Taille :</label>
+                                    <select id="size-${prod.id}" class="option-select">
+                                        <option value="S">S (38-39)</option>
+                                        <option value="M" selected>M (40-41)</option>
+                                        <option value="L">L (42-43)</option>
+                                        <option value="XL">XL (44-45)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="option-group">
+                                    <label for="quality-${prod.id}">Qualité :</label>
+                                    <select id="quality-${prod.id}" class="option-select" onchange="adjustPrice(${prod.id}, ${prod.price})">
+                                        ${qualityOptionsHtml}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-add" onclick="prepareAddToCart(${prod.id}, '${safeName}', ${prod.price})">AJOUTER AU PANIER</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function loginAdmin() {
+            const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
+            if (entry === ADMIN_PASSWORD) {
+                document.getElementById('admin-panel').style.display = 'block';
+                renderAdminTable();
+                window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
+            } else if (entry !== null) {
+                alert("Mot de passe incorrect. Accès refusé.");
+            }
+        }
+
+        function renderAdminTable() {
+            const tableBody = document.getElementById('admin-table-body');
+            tableBody.innerHTML = "";
+
+            productsData.forEach(prod => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td><strong>${prod.id}</strong></td>
+                        <td><input type="text" id="edit-name-${prod.id}" value="${prod.name}"></td>
+                        <td><input type="text" id="edit-image-${prod.id}" value="${prod.image}"></td>
+                        <td><input type="number" id="edit-price-${prod.id}" value="${prod.price}"></td>
+                        <td>
+                            <select id="edit-qualitytype-${prod.id}">
+                                <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Gamme Coton</option>
+                                <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Gamme Nylon</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="admin-supp-box">
+                                <div>Coton: <input type="number" id="edit-supp-coton-${prod.id}" value="${prod.suppCoton || 0}" min="0"></div>
+                                <div>Nylon: <input type="number" id="edit-supp-nylon-${prod.id}" value="${prod.suppNylon || 0}" min="0"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function saveAdminChanges() {
+            productsData.forEach(prod => {
+                prod.name = document.getElementById(`edit-name-${prod.id}`).value;
+                prod.image = document.getElementById(`edit-image-${prod.id}`).value;
+                prod.price = parseInt(document.getElementById(`edit-price-${prod.id}`).value) || 0;
+                prod.qualityType = document.getElementById(`edit-qualitytype-${prod.id}`).value;
+                prod.suppCoton = parseInt(document.getElementById(`edit-supp-coton-${prod.id}`).value) || 0;
+                prod.suppNylon = parseInt(document.getElementById(`edit-supp-nylon-${prod.id}`).value) || 0;
+            });
+
+            localStorage.setItem('axis_store_products_v2', JSON.stringify(productsData));
+            alert("Les 30 articles et leurs modifications ont bien été enregistrés !");
+            renderCatalog();
+            document.getElementById('admin-panel').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function adjustPrice(productId, originalPrice) {
+            const qualityElement = document.getElementById(`quality-${productId}`);
+            const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
+            const finalPrice = originalPrice + extra;
+            document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
+        }
+
+        function prepareAddToCart(productId, name, originalPrice) {
+            const size = document.getElementById(`size-${productId}`).value;
+            const qualityElement = document.getElementById(`quality-${productId}`);
+            const qualityLabel = qualityElement.options[qualityElement.selectedIndex].text.split(' (')[0];
+            const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
+            
+            const finalPrice = originalPrice + extra;
+            addToCart(name, finalPrice, size, qualityLabel);
+        }
+
+        function addToCart(name, price, size, quality) {
+            const existingItem = cart.find(item => item.name === name && item.size === size && item.quality === quality);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, size, quality, quantity: 1 });
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(name, size, quality) {
+            cart = cart.filter(item => !(item.name === name && item.size === size && item.quality === quality));
+            updateCartUI();
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (confirm("Voulez-vous vider votre panier ?")) {
+                cart = [];
+                document.getElementById('client-name').value = '';
+                document.getElementById('client-delivery').value = '';
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const cartItemsDiv = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartCountNav = document.getElementById('cart-count-nav');
+            const cartTotal = document.getElementById('cart-total');
+            
+            let total = 0;
+            let count = 0;
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
+                cartCount.innerText = '0';
+                cartCountNav.innerText = '0';
+                cartTotal.innerText = '0';
+                return;
+            }
+
+            cartItemsDiv.innerHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
+                
+                const safeCartName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                cartItemsDiv.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-detail">
+                            <button class="btn-remove" onclick="removeFromCart('${safeCartName}', '${item.size}', '${item.quality}')">❌</button>
+                            <div>
+                                <span>${item.name} (x${item.quantity})</span>
+                                <span class="cart-item-meta">Taille: ${item.size} | Qualité: ${item.quality}</span>
+                            </div>
+                        </div>
+                        <strong>${itemTotal.toLocaleString()} FCFA</strong>
+                    </div>
+                `;
+            });
+
+            cartCount.innerText = count;
+            cartCountNav.innerText = count;
+            cartTotal.innerText = total.toLocaleString();
+        }
+
+        function sendOrder() {
+            const name = document.getElementById('client-name').value.trim();
+            const delivery = document.getElementById('client-delivery').value.trim();
+
+            if (cart.length === 0) {
+                alert("Votre panier est vide !");
+                return;
+            }
+            if (!name || !delivery) {
+                alert("Veuillez renseigner votre nom et votre adresse de livraison.");
+                return;
+            }
+
+            let receipt = `🧾 *AXIS STORE - REÇU DE COMMANDE* 🧾\n\n`;
+            receipt += `👤 *Client :* ${name}\n`;
+            receipt += `📍 *Livraison :* ${delivery}\n`;
+            receipt += `----------------------------------\n`;
+
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                receipt += `▪️ ${item.name} (x${item.quantity})\n   Taille: ${item.size} | Qualité: ${item.quality}\n   Prix: ${itemTotal.toLocaleString()} FCFA\n\n`;
+            });
+
+            receipt += `----------------------------------\n`;
+            receipt += `💰 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\n`;
+            receipt += `Merci pour votre confiance ! Veuillez confirmer la réception de ce reçu.`;
+
+            const encodedText = encodeURIComponent(receipt);
+            const whatsappUrl = `https://wa.me/${MERCHANT_NUMBER}?text=${encodedText}`;
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        initProductsData();
+        renderCatalog();
+        updateCartUI();
+   </script>
+</body>
+</html>
