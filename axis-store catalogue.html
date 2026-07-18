@@ -233,7 +233,7 @@
         const _pfx = "225"; 
         const _num = "0720648060";
         const MERCHANT_NUMBER = _pfx + _num; 
-        const ADMIN_HASH = "8c66c3db2699f5724b08709087c02bb0500bf8a08a287df10714ee673327668b"; // Correspond à LBG@.COM encodé
+        const ADMIN_PASSWORD = "LBG@.COM"; // Mot de passe admin en clair
         
         let cart = [];
         let productsData = [];
@@ -339,18 +339,16 @@
             });
         }
 
-        // Vérification du mot de passe avec hash SHA256
+        // Vérification du mot de passe
         window.loginAdmin = function() {
             const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
             if (entry !== null) {
-                const trimmedEntry = entry.trim();
-                const entryHash = CryptoJS.SHA256(trimmedEntry).toString();
-                if (entryHash === ADMIN_HASH) {
+                if (entry === ADMIN_PASSWORD) {
                     document.getElementById('admin-panel').style.display = 'block';
                     renderAdminTable();
                     window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
                 } else {
-                    alert("Mot de passe incorrect. Accès refusé.");
+                    alert("Mot de passe incorrect. Accès refusé.\n\nMot de passe attendu: LBG@.COM");
                 }
             }
         };
