@@ -143,7 +143,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="index.html">Accueil</a></li>
+                <li><a href="axis-store acceuil.html.">Accueil</a></li>
                 <li><a href="#cart-section" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -218,51 +218,37 @@
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
-   <!-- Inclusion des modules Firebase modernes via CDN -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+   <!-- Inclusion de CryptoJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // Configuration locale (sans Firebase)
 
-        // 1. Configuration Firebase (Collez vos clés ici)
-        const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "votre-projet.firebaseapp.com",
-            databaseURL: "https://votre-projet-default-rtdb.firebaseio.com",
-            projectId: "votre-projet",
-            storageBucket: "votre-projet.appspot.com",
-            messagingSenderId: "...",
-            appId: "..."
-        };
-
-        // 2. Initialisation
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const MERCHANT_NUMBER = "2250720648060"; 
-        const ADMIN_PASSWORD = "LBG@.COM"; 
+        // SÉCURISATION : Reconstruction dynamique du numéro et empreinte SHA-256 du mot de passe
+        const _pfx = "225"; const _num = "0720648060";
+        const MERCHANT_NUMBER = _pfx + _num; 
+        const ADMIN_HASH = "8c66c3db2699f5724b08709087c02bb0500bf8a08a287df10714ee673327668b"; // Correspond à LBG@.COM encodé
         
         let cart = [];
         let productsData = [];
 
-        // 3. Écoute des produits en temps réel
+        // Écoute des produits en temps réel (depuis localStorage)
         function listenToProducts() {
-            const productsRef = ref(db, 'products');
-            onValue(productsRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    productsData = data;
-                    renderCatalog();
-                    if (document.getElementById('admin-panel').style.display === 'block') {
-                        renderAdminTable();
-                    }
-                } else {
-                    createDefaultProductsInFirebase();
+            const savedProducts = localStorage.getItem('axisStoreProducts');
+            if (savedProducts) {
+                try {
+                    productsData = JSON.parse(savedProducts);
+                } catch (e) {
+                    createDefaultProducts();
                 }
-            });
+            } else {
+                createDefaultProducts();
+            }
+            renderCatalog();
+            updateCartUI();
         }
 
-        // 4. Création des 30 produits par défaut si la base est vide
-        function createDefaultProductsInFirebase() {
+        // Création des 30 produits par défaut si la base est vide
+        function createDefaultProducts() {
             const baseProducts = [
                 { id: 1, name: "Ensemble Coton Premium Axis", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
                 { id: 2, name: "Short Nylon Léger Jogger", price: 12000, type: "nylon", cat: "Sportline", badge: "Top Vente", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
@@ -274,7 +260,7 @@
                 const template = baseProducts[(i - 1) % baseProducts.length];
                 initialData.push({
                     id: i,
-                    badge: i <= 6 ? template.badge : "Disponible",
+                    badge: i <= 3 ? template.badge : "Disponible",
                     category: template.cat,
                     name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
                     price: template.price,
@@ -284,7 +270,9 @@
                     suppNylon: template.type === "nylon" ? 2000 : 3000
                 });
             }
-            set(ref(db, 'products'), initialData);
+            productsData = initialData;
+            localStorage.setItem('axisStoreProducts', JSON.stringify(initialData));
+            renderCatalog();
         }
 
         function renderCatalog() {
@@ -344,14 +332,22 @@
             });
         }
 
+        // SÉCURISÉ : Vérification par comparaison de Hachage
         window.loginAdmin = function() {
             const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
-            if (entry === ADMIN_PASSWORD) {
-                document.getElementById('admin-panel').style.display = 'block';
-                renderAdminTable();
-                window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
-            } else if (entry !== null) {
-                alert("Mot de passe incorrect. Accès refusé.");
+            if (entry !== null) {
+                const trimmedEntry = entry.trim();
+                const entryHash = CryptoJS.SHA256(trimmedEntry).toString();
+                console.log("Hash entré:", entryHash);
+                console.log("Hash attendu:", ADMIN_HASH);
+                if (entryHash === ADMIN_HASH) {
+                    document.getElementById('admin-panel').style.display = 'block';
+                    renderAdminTable();
+                    window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
+                } else {
+                    alert("Mot de passe incorrect. Accès refusé.\n\nIndice: Assurez-vous que le mot de passe est correct (vérifiez les majuscules, minuscules et espaces).");
+                    console.log("Tentative échouée avec:", trimmedEntry);
+                }
             }
         };
 
@@ -384,7 +380,7 @@
             });
         }
 
-        // 5. Sauvegarde des changements directement vers Firebase
+        // Sauvegarde des changements dans localStorage
         window.saveAdminChanges = function() {
             let updatedProducts = [];
             productsData.forEach(prod => {
@@ -402,15 +398,12 @@
                 });
             });
 
-            set(ref(db, 'products'), updatedProducts)
-                .then(() => {
-                    alert("Modifications synchronisées avec succès pour tous les visiteurs !");
-                    document.getElementById('admin-panel').style.display = 'none';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                })
-                .catch((error) => {
-                    alert("Erreur de sauvegarde : " + error.message);
-                });
+            productsData = updatedProducts;
+            localStorage.setItem('axisStoreProducts', JSON.stringify(updatedProducts));
+            alert("Modifications enregistrées avec succès !");
+            document.getElementById('admin-panel').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderCatalog();
         };
 
         window.adjustPrice = function(productId, originalPrice) {
@@ -519,5 +512,4 @@
         };
 
         listenToProducts();
-        updateCartUI();
     </script>
