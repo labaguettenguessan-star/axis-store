@@ -198,8 +198,21 @@
     </div>
 
     <div class="admin-trigger-zone">
-        <button class="btn-admin-login" onclick="loginAdmin()">🔑 Accéder à l'espace de gestion (Privé)</button>
+        <button class="btn-admin-login" onclick="showLoginForm()">🔑 Accéder à l'espace de gestion (Privé)</button>
     </div>
+
+    <!-- Formulaire de connexion -->
+    <div id="login-form" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 2000;">
+        <h2 style="margin-bottom: 20px; color: #111;">Connexion Admin</h2>
+        <input type="password" id="admin-password-input" placeholder="Entrez le mot de passe" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 10px;">
+            <button onclick="submitLogin()" style="flex: 1; background: #39ff14; color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer;">Connexion</button>
+            <button onclick="closeLoginForm()" style="flex: 1; background: #e74c3c; color: white; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer;">Annuler</button>
+        </div>
+    </div>
+
+    <!-- Overlay derrière le formulaire -->
+    <div id="login-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999;" onclick="closeLoginForm()"></div>
 
     <div class="admin-panel" id="admin-panel">
         <h2>PANNEAU DE GESTION DES ARTICLES (AXIS STORE)</h2>
@@ -340,18 +353,43 @@
         }
 
         // Vérification du mot de passe
-        window.loginAdmin = function() {
-            const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
-            if (entry !== null) {
-                if (entry === ADMIN_PASSWORD) {
-                    document.getElementById('admin-panel').style.display = 'block';
-                    renderAdminTable();
-                    window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
-                } else {
-                    alert("Mot de passe incorrect. Accès refusé.\n\nMot de passe attendu: LBG@.COM");
-                }
+        function showLoginForm() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('login-overlay').style.display = 'block';
+            document.getElementById('admin-password-input').focus();
+        }
+
+        function closeLoginForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('admin-password-input').value = '';
+        }
+
+        function submitLogin() {
+            const entry = document.getElementById('admin-password-input').value;
+            if (entry === ADMIN_PASSWORD) {
+                closeLoginForm();
+                document.getElementById('admin-panel').style.display = 'block';
+                renderAdminTable();
+                window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
+            } else {
+                alert("Mot de passe incorrect. Accès refusé.\n\nMot de passe attendu: LBG@.COM");
+                document.getElementById('admin-password-input').value = '';
+                document.getElementById('admin-password-input').focus();
             }
-        };
+        }
+
+        // Permet d'appuyer sur Entrée pour soumettre
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('admin-password-input');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitLogin();
+                    }
+                });
+            }
+        });
 
         function renderAdminTable() {
             const tableBody = document.getElementById('admin-table-body');
