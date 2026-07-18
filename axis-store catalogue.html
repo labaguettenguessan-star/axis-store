@@ -218,68 +218,94 @@
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
-    <script>
+   <!-- Inclusion des modules Firebase modernes via CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // 1. Configuration Firebase (Collez vos clés ici)
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "votre-projet.firebaseapp.com",
+            databaseURL: "https://votre-projet-default-rtdb.firebaseio.com",
+            projectId: "votre-projet",
+            storageBucket: "votre-projet.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+
+        // 2. Initialisation
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         const MERCHANT_NUMBER = "2250720648060"; 
         const ADMIN_PASSWORD = "LBG@.COM"; 
         
         let cart = [];
         let productsData = [];
 
-        function initProductsData() {
-            const savedData = localStorage.getItem('axis_store_products_v2');
-            if (savedData) {
-                productsData = JSON.parse(savedData);
-            } else {
-                const baseProducts = [
-                    { id: 1, name: "Ensemble Coton Premium Axis", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
-                    { id: 2, name: "Short Nylon Léger Jogger", price: 12000, type: "nylon", cat: "Sportline", badge: "Top Vente", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
-                    { id: 3, name: "Chaussure Axis Track v1", price: 35000, type: "coton", cat: "Luxe & Tradition", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" }
-                ];
-
-                productsData = [];
-                
-                for (let i = 1; i <= 30; i++) {
-                    const template = baseProducts[(i - 1) % baseProducts.length];
-                    productsData.push({
-                        id: i,
-                        badge: i <= 3 ? template.badge : "Disponible",
-                        category: template.cat,
-                        name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
-                        price: template.price,
-                        image: template.image,
-                        qualityType: template.type,
-                        suppCoton: 0,
-                        suppNylon: template.type === "nylon" ? 2000 : 3000
-                    });
+        // 3. Écoute des produits en temps réel
+        function listenToProducts() {
+            const productsRef = ref(db, 'products');
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    productsData = data;
+                    renderCatalog();
+                    if (document.getElementById('admin-panel').style.display === 'block') {
+                        renderAdminTable();
+                    }
+                } else {
+                    createDefaultProductsInFirebase();
                 }
-                localStorage.setItem('axis_store_products_v2', JSON.stringify(productsData));
-            }
+            });
         }
-                  
+
+        // 4. Création des 30 produits par défaut si la base est vide
+        function createDefaultProductsInFirebase() {
+            const baseProducts = [
+                { id: 1, name: "Ensemble Coton Premium Axis", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+                { id: 2, name: "Short Nylon Léger Jogger", price: 12000, type: "nylon", cat: "Sportline", badge: "Top Vente", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+                { id: 3, name: "Chaussure Axis Track v1", price: 35000, type: "coton", cat: "Luxe & Tradition", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" }
+            ];
+
+            let initialData = [];
+            for (let i = 1; i <= 30; i++) {
+                const template = baseProducts[(i - 1) % baseProducts.length];
+                initialData.push({
+                    id: i,
+                    badge: i <= 6 ? template.badge : "Disponible",
+                    category: template.cat,
+                    name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
+                    price: template.price,
+                    image: template.image,
+                    qualityType: template.type,
+                    suppCoton: 0,
+                    suppNylon: template.type === "nylon" ? 2000 : 3000
+                });
+            }
+            set(ref(db, 'products'), initialData);
+        }
+
         function renderCatalog() {
             const catalogContainer = document.getElementById('catalog-products');
             catalogContainer.innerHTML = "";
 
             productsData.forEach(prod => {
+                if (!prod) return;
                 const sc = prod.suppCoton || 0;
                 const sn = prod.suppNylon || 0;
 
-                let qualityOptionsHtml = '';
-                if(prod.qualityType === "nylon") {
-                    qualityOptionsHtml = `
-                        <option value="Coton Standard" data-extra="${sc}">Coton Classique (+${sc} FCFA)</option>
-                        <option value="Nylon Premium" data-extra="${sn}" selected>Nylon Premium (+${sn} FCFA)</option>
-                    `;
-                } else {
-                    qualityOptionsHtml = `
-                        <option value="Coton Standard" data-extra="${sc}" selected>Coton Classique (+${sc} FCFA)</option>
-                        <option value="Nylon Standard" data-extra="${sn}">Nylon Basique (+${sn} FCFA)</option>
-                    `;
-                }
+                let qualityOptionsHtml = prod.qualityType === "nylon" ? `
+                    <option value="Coton Standard" data-extra="${sc}">Coton Classique (+${sc} FCFA)</option>
+                    <option value="Nylon Premium" data-extra="${sn}" selected>Nylon Premium (+${sn} FCFA)</option>
+                ` : `
+                    <option value="Coton Standard" data-extra="${sc}" selected>Coton Classique (+${sc} FCFA)</option>
+                    <option value="Nylon Standard" data-extra="${sn}">Nylon Basique (+${sn} FCFA)</option>
+                `;
 
                 const defaultExtra = prod.qualityType === "nylon" ? sn : sc;
                 const initialDisplayedPrice = prod.price + defaultExtra;
-                
                 const safeName = prod.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 catalogContainer.innerHTML += `
@@ -304,7 +330,6 @@
                                         <option value="XL">XL (44-45)</option>
                                     </select>
                                 </div>
-                                
                                 <div class="option-group">
                                     <label for="quality-${prod.id}">Qualité :</label>
                                     <select id="quality-${prod.id}" class="option-select" onchange="adjustPrice(${prod.id}, ${prod.price})">
@@ -312,7 +337,6 @@
                                     </select>
                                 </div>
                             </div>
-                            
                             <button class="btn-add" onclick="prepareAddToCart(${prod.id}, '${safeName}', ${prod.price})">AJOUTER AU PANIER</button>
                         </div>
                     </div>
@@ -320,7 +344,7 @@
             });
         }
 
-        function loginAdmin() {
+        window.loginAdmin = function() {
             const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
             if (entry === ADMIN_PASSWORD) {
                 document.getElementById('admin-panel').style.display = 'block';
@@ -329,13 +353,14 @@
             } else if (entry !== null) {
                 alert("Mot de passe incorrect. Accès refusé.");
             }
-        }
+        };
 
         function renderAdminTable() {
             const tableBody = document.getElementById('admin-table-body');
             tableBody.innerHTML = "";
 
             productsData.forEach(prod => {
+                if (!prod) return;
                 tableBody.innerHTML += `
                     <tr>
                         <td><strong>${prod.id}</strong></td>
@@ -359,39 +384,50 @@
             });
         }
 
-        function saveAdminChanges() {
+        // 5. Sauvegarde des changements directement vers Firebase
+        window.saveAdminChanges = function() {
+            let updatedProducts = [];
             productsData.forEach(prod => {
-                prod.name = document.getElementById(`edit-name-${prod.id}`).value;
-                prod.image = document.getElementById(`edit-image-${prod.id}`).value;
-                prod.price = parseInt(document.getElementById(`edit-price-${prod.id}`).value) || 0;
-                prod.qualityType = document.getElementById(`edit-qualitytype-${prod.id}`).value;
-                prod.suppCoton = parseInt(document.getElementById(`edit-supp-coton-${prod.id}`).value) || 0;
-                prod.suppNylon = parseInt(document.getElementById(`edit-supp-nylon-${prod.id}`).value) || 0;
+                if (!prod) return;
+                updatedProducts.push({
+                    id: prod.id,
+                    badge: prod.badge || "Disponible",
+                    category: prod.category || "Général",
+                    name: document.getElementById(`edit-name-${prod.id}`).value,
+                    image: document.getElementById(`edit-image-${prod.id}`).value,
+                    price: parseInt(document.getElementById(`edit-price-${prod.id}`).value) || 0,
+                    qualityType: document.getElementById(`edit-qualitytype-${prod.id}`).value,
+                    suppCoton: parseInt(document.getElementById(`edit-supp-coton-${prod.id}`).value) || 0,
+                    suppNylon: parseInt(document.getElementById(`edit-supp-nylon-${prod.id}`).value) || 0
+                });
             });
 
-            localStorage.setItem('axis_store_products_v2', JSON.stringify(productsData));
-            alert("Les 30 articles et leurs modifications ont bien été enregistrés !");
-            renderCatalog();
-            document.getElementById('admin-panel').style.display = 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            set(ref(db, 'products'), updatedProducts)
+                .then(() => {
+                    alert("Modifications synchronisées avec succès pour tous les visiteurs !");
+                    document.getElementById('admin-panel').style.display = 'none';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                })
+                .catch((error) => {
+                    alert("Erreur de sauvegarde : " + error.message);
+                });
+        };
 
-        function adjustPrice(productId, originalPrice) {
+        window.adjustPrice = function(productId, originalPrice) {
             const qualityElement = document.getElementById(`quality-${productId}`);
             const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
             const finalPrice = originalPrice + extra;
             document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
-        }
+        };
 
-        function prepareAddToCart(productId, name, originalPrice) {
+        window.prepareAddToCart = function(productId, name, originalPrice) {
             const size = document.getElementById(`size-${productId}`).value;
             const qualityElement = document.getElementById(`quality-${productId}`);
             const qualityLabel = qualityElement.options[qualityElement.selectedIndex].text.split(' (')[0];
             const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
-            
             const finalPrice = originalPrice + extra;
             addToCart(name, finalPrice, size, qualityLabel);
-        }
+        };
 
         function addToCart(name, price, size, quality) {
             const existingItem = cart.find(item => item.name === name && item.size === size && item.quality === quality);
@@ -403,12 +439,12 @@
             updateCartUI();
         }
 
-        function removeFromCart(name, size, quality) {
+        window.removeFromCart = function(name, size, quality) {
             cart = cart.filter(item => !(item.name === name && item.size === size && item.quality === quality));
             updateCartUI();
-        }
+        };
 
-        function clearCart() {
+        window.clearCart = function() {
             if (cart.length === 0) return;
             if (confirm("Voulez-vous vider votre panier ?")) {
                 cart = [];
@@ -416,7 +452,7 @@
                 document.getElementById('client-delivery').value = '';
                 updateCartUI();
             }
-        }
+        };
 
         function updateCartUI() {
             const cartItemsDiv = document.getElementById('cart-items');
@@ -436,12 +472,10 @@
             }
 
             cartItemsDiv.innerHTML = '';
-
             cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
                 count += item.quantity;
-                
                 const safeCartName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 cartItemsDiv.innerHTML += `
@@ -463,24 +497,16 @@
             cartTotal.innerText = total.toLocaleString();
         }
 
-        function sendOrder() {
+        window.sendOrder = function() {
             const name = document.getElementById('client-name').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
 
-            if (cart.length === 0) {
-                alert("Votre panier est vide !");
-                return;
-            }
-            if (!name || !delivery) {
-                alert("Veuillez renseigner votre nom et votre adresse de livraison.");
+            if (cart.length === 0 || !name || !delivery) {
+                alert("Veuillez remplir votre panier, nom et adresse de livraison.");
                 return;
             }
 
-            let receipt = `🧾 *AXIS STORE - REÇU DE COMMANDE* 🧾\n\n`;
-            receipt += `👤 *Client :* ${name}\n`;
-            receipt += `📍 *Livraison :* ${delivery}\n`;
-            receipt += `----------------------------------\n`;
-
+            let receipt = `🧾 *AXIS STORE - REÇU DE COMMANDE* 🧾\n\n👤 *Client :* ${name}\n📍 *Livraison :* ${delivery}\n----------------------------------\n`;
             let total = 0;
             cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
@@ -488,19 +514,10 @@
                 receipt += `▪️ ${item.name} (x${item.quantity})\n   Taille: ${item.size} | Qualité: ${item.quality}\n   Prix: ${itemTotal.toLocaleString()} FCFA\n\n`;
             });
 
-            receipt += `----------------------------------\n`;
-            receipt += `💰 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\n`;
-            receipt += `Merci pour votre confiance ! Veuillez confirmer la réception de ce reçu.`;
+            receipt += `----------------------------------\n💰 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\nMerci pour votre confiance !`;
+            window.open(`https://wa.me/${MERCHANT_NUMBER}?text=${encodeURIComponent(receipt)}`, '_blank');
+        };
 
-            const encodedText = encodeURIComponent(receipt);
-            const whatsappUrl = `https://wa.me/${MERCHANT_NUMBER}?text=${encodedText}`;
-
-            window.open(whatsappUrl, '_blank');
-        }
-
-        initProductsData();
-        renderCatalog();
+        listenToProducts();
         updateCartUI();
-   </script>
-</body>
-</html>
+    </script>
