@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AXIS Footwear | L'Axe de la Performance</title>
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #ffffff;
+            --accent-color: #39ff14; /* Vert Néon / Électrique */
+            --gray-dark: #161616;
+            --gray-light: #888888;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+        }
+        /* --- NAVIGATION --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 10%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 10%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text-color);
+        }
+
+        .hero p {
+            color: var(--gray-light);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(57, 255, 20, 0.3);
+        }
+
+        /* Arrière-plan graphique de la Hero section */
+        .hero-bg-graphic {
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 30vw;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.02);
+            user-select: none;
+            z-index: 1;
+            line-height: 1;
+        }
+
+        /* --- SECTION CONCEPT --- */
+        .concept {
+            padding: 100px 10%;
+            background-color: var(--gray-dark);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+        }
+
+        .concept-card {
+            border-top: 2px solid var(--accent-color);
+            padding-top: 20px;
+        }
+
+        .concept-card h3 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .concept-card p {
+            color: var(--gray-light);
+            line-height: 1.6;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 40px 10%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray-light);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            header { 
+                padding: 20px 5%; 
+            }
+            header nav ul {
+                display: flex;
+                gap: 15px;
+            }
+            header nav ul li a {
+                font-size: 0.8rem;
+            }
+            .hero { 
+                padding: 0 5%; 
+            }
+            .hero h1 { 
+                font-size: 2.8rem; 
+            }
+            .concept { 
+                padding: 60px 5%; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">AXIS <span>STORE</span></div>
+        <nav>
+            <ul>
+                     <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a href="axis-store catalogue.html">CATALOGUE</a></li>
+                <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+ 
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Trouvez<br>Votre <span>Axe</span></h1>
+            <p>Plus qu'une direction, une impulsion. AXIS STORE facilite tes achats en ligne sans crainte.</p>
+            <a href="axis-store catalogue.html" class="btn">Découvrir notre catalogue</a>
+        </div>
+        <div class="hero-bg-graphic">A</div>
+    </section>
+
+    <section class="concept">
+        <div class="concept-card">
+            <h3>L'Axe</h3>
+            <p>Chaque produit est choisi autour d'un alignement parfait entre le confort anatomique et le style avant-gardiste.</p>
+        </div>
+        <div class="concept-card">
+            <h3>Le Mouvement</h3>
+            <p>Nous choisissons chaque modèle un par un parmi les marques les plus fiables.</p>
+        </div>
+        <div class="concept-card">
+            <h3>L'Impact</h3>
+            <p>Nous ne faisons pas que revendre des boîtes : nous connaissons les marques, nous validons leur confort et nous vous garantissons le vrai prix officiel.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy;  2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
+    </footer>
+
+</body>
+</html>
