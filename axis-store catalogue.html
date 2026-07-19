@@ -77,7 +77,7 @@
     position: relative; 
     width: 100%; 
     height: 240px; 
-    background: #f0f0f0; /* Un fond gris clair pour combler le vide proprement */
+    background: #f0f0f0; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,6 +90,19 @@
     object-fit: contain; 
     opacity: 1 !important; 
     visibility: visible !important;
+}
+
+.badge-expert { 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    background: #e67e22; 
+    color: white; 
+    font-size: 0.75em; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-weight: bold;
+    z-index: 5; /* Force le badge à passer au-dessus de l'image et du fond */
 }
         .btn-quick-edit {
             display: none;
