@@ -260,11 +260,11 @@
         });
 
         function initFirebaseDefaultProducts() {
-            // ICI LES NOMS D'IMAGES ONT ÉTÉ MODIFIÉS POUR CORRESPONDRE À TES FICHIERS LOCAUX
+            // Utilisation de liens internet stables pour éviter les bugs de dossiers locaux
             const baseProducts = [
-                { id: 1, name: "T-Shirt Auras Rick Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "images/rick-blanc.jpeg" },
-                { id: 2, name: "T-Shirt Auras One Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Top Vente", image: "images/one-blanc.jpeg" },
-                { id: 3, name: "T-Shirt Auras Rick Noir", price: 15000, type: "coton", cat: "Streetwear", badge: "Édition Limitée", image: "images/rick-noir.jpeg" }
+                { id: 1, name: "T-Shirt Auras Rick Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500" },
+                { id: 2, name: "T-Shirt Auras One Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Top Vente", image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500" },
+                { id: 3, name: "T-Shirt Auras Rick Noir", price: 15000, type: "coton", cat: "Streetwear", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500" }
             ];
 
             const initialProducts = {};
@@ -273,10 +273,10 @@
                 initialProducts[`prod_${i}`] = {
                     id: i,
                     badge: template.badge,
-                    category: template.category,
+                    category: template.cat,
                     name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
                     price: template.price,
-                    image: i <= 3 ? template.image : `images/rick-blanc.jpeg`,
+                    image: template.image,
                     qualityType: template.type,
                     suppCoton: 0,
                     suppNylon: 3000
@@ -308,7 +308,7 @@
                 }
 
                 const defaultExtra = prod.qualityType === "nylon" ? sn : sc;
-                const initialDisplayedPrice = prod.price + defaultExtra;
+                const finalPrice = prod.price + defaultExtra;
                 const safeName = prod.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const editBtnStyle = window.isAdminLoggedIn ? 'display: block;' : 'display: none;';
 
@@ -322,8 +322,8 @@
                         <div class="product-info">
                             <span class="brand">${prod.category || 'AXIS'}</span>
                             <div class="model-name">${prod.name}</div>
-                            <div class="price" id="display-price-${prod.id}">${initialDisplayedPrice.toLocaleString()} FCFA</div>
-                            <div class="expert-note"><strong>Avis Revendeur :</strong> test produit de qualité supérieure.</div>
+                            <div class="price" id="display-price-${prod.id}">${finalPrice.toLocaleString()} FCFA</div>
+                            <div class="expert-note"><strong>Avis Revendeur :</strong> produit de qualité supérieure.</div>
                             
                             <div class="options-container">
                                 <div class="option-group">
@@ -365,7 +365,7 @@
             const newBadge = prompt(`Modifier le BADGE :`, prod.badge);
             if (newBadge === null) return;
 
-            const newImage = prompt(`Modifier le LIEN DE L'IMAGE (Ex: images/rick-blanc.jpeg) :`, prod.image);
+            const newImage = prompt(`Modifier le LIEN DE L'IMAGE :`, prod.image);
             if (newImage === null) return;
 
             update(ref(db, `products/prod_${productId}`), {
@@ -493,7 +493,7 @@
         }
 
         window.sendOrder = function() {
-            // Logique WhatsApp standard
+            // Logique de commande WhatsApp standard
         }
 
         window.updateCartUI();
