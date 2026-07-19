@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Privé - AXIS STORE</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #101010; color: #fff; padding: 40px; max-width: 1200px; margin: 0 auto; }
+        h1 { color: #39ff14; text-align: center; margin-bottom: 30px; }
+        .login-box { max-width: 400px; margin: 50px auto; background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #333; text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 6px; }
+        button { width: 100%; padding: 12px; background: #39ff14; color: black; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #2bdc0f; }
+        .hidden { display: none; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #333; text-align: left; }
+        .admin-table th { background: #222; color: #39ff14; }
+        .logout-btn { background: #e74c3c; color: white; margin-top: 10px; width: auto; padding: 5px 15px; }
+    </style>
+</head>
+<body>
+
+    <h1>🔒 DASHBOARD DE GESTION AXIS STORE</h1>
+
+    <!-- FORMULAIRE DE CONNEXION FIREBASE -->
+    <div id="auth-container" class="login-box">
+        <h2>Connexion Securisée</h2>
+        <input type="email" id="admin-email" placeholder="Email Admin" value="labaguettenguessan@gmail.com">
+        <input type="password" id="admin-password" placeholder="Mot de passe secret">
+        <button onclick="handleLogin()">Se connecter</button>
+    </div>
+
+    <!-- TABLEAU DE MODIFICATION (Caché tant qu'on est pas connecté) -->
+    <div id="dashboard-container" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <p>Statut : 🟢 Connecté en tant que gérant.</p>
+            <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 25%;">Nom du modèle</th>
+                        <th style="width: 30%;">Lien Photo (URL)</th>
+                        <th style="width: 15%;">Prix de Base (FCFA)</th>
+                        <th style="width: 10%;">Matériau</th>
+                        <th style="width: 15%;">Suppléments (Coton/Nylon)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Rempli dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+        <button style="margin-top: 25px;" onclick="saveChanges()">SAUVEGARDER TOUTES LES MODIFICATIONS</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8mFRkNYjYTF_g4AWttKrHccY9H-AWN54",
+            authDomain: "axis-store-829fb.firebaseapp.com",
+            databaseURL: "https://axis-store-829fb-default-rtdb.firebaseio.com/",
+            projectId: "axis-store-829fb",
+            storageBucket: "axis-store-829fb.firebasestorage.app",
+            messagingSenderId: "724482318031",
+            appId: "1:724482318031:web:c3448b95d73b4f0fade1ba"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        window.productsData = [];
+
+        // Protection par Authentification
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === 'LiPMCiiqIUNGVutGlCVbCkLieUO2') {
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('dashboard-container').classList.remove('hidden');
+                loadDatabase();
+            } else {
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById('dashboard-container').classList.add('hidden');
+            }
+        });
+
+        window.handleLogin = function() {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            signInWithEmailAndPassword(auth, email, password).catch(err => alert("Accès refusé : " + err.message));
+        }
+
+        window.handleLogout = function() { signOut(auth); }
+
+        function loadDatabase() {
+            onValue(ref(db, 'products'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    window.productsData = Object.values(data).filter(p => p !== null);
+                    renderTable();
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = "";
+            window.productsData.forEach(prod => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${prod.id}</strong></td>
+                        <td><input type="text" id="name-${prod.id}" value="${prod.name}"></td>
+                        <td><input type="text" id="image-${prod.id}" value="${prod.image}"></td>
+                        <td><input type="number" id="price-${prod.id}" value="${prod.price}"></td>
+                        <td>
+                            <select id="type-${prod.id}">
+                                <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Coton</option>
+                                <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Nylon</option>
+                            </select>
+                        </td>
+                        <td>
+                            Coton: <input type="number" style="width:70px; display:inline;" id="sc-${prod.id}" value="${prod.suppCoton || 0}"><br>
+                            Nylon: <input type="number" style="width:70px; display:inline;" id="sn-${prod.id}" value="${prod.suppNylon || 0}">
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.saveChanges = function() {
+            const updates = {};
+            window.productsData.forEach(prod => {
+                const id = prod.id;
+                updates[`products/prod_${id}/name`] = document.getElementById(`name-${id}`).value;
+                updates[`products/prod_${id}/image`] = document.getElementById(`image-${id}`).value;
+                updates[`products/prod_${id}/price`] = parseInt(document.getElementById(`price-${id}`).value) || 0;
+                updates[`products/prod_${id}/qualityType`] = document.getElementById(`type-${id}`).value;
+                updates[`products/prod_${id}/suppCoton`] = parseInt(document.getElementById(`sc-${id}`).value) || 0;
+                updates[`products/prod_${id}/suppNylon`] = parseInt(document.getElementById(`sn-${id}`).value) || 0;
+            });
+
+            update(ref(db), updates)
+                .then(() => alert("Modifications enregistrées avec succès sur Firebase !"))
+                .catch(err => alert("Erreur de sauvegarde : " + err.message));
+        }
+    </script>
+</body>
+</html>
