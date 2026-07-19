@@ -73,17 +73,24 @@
             position: relative;
         }
         .product-card:hover { transform: translateY(-3px); }
-        
-       .image-container img { 
+     .image-container { 
+    position: relative; 
     width: 100%; 
-    height: 100%; 
-    object-fit: contain; /* Pour voir l'image entière */
-    opacity: 1 !important; /* Force l'image à être visible tout le temps */
+    height: 240px; 
+    background: #f0f0f0; /* Un fond gris clair pour combler le vide proprement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.image-container img { 
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; 
+    opacity: 1 !important; 
     visibility: visible !important;
 }
-.image-container  { width: 100%; height: 100%; object-fit: contain; }
-        .badge-expert { position: absolute; top: 10px; left: 10px; background: #e67e22; color: white; font-size: 0.75em; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-        
         .btn-quick-edit {
             display: none;
             position: absolute;
