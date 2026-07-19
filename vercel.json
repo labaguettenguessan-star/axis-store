@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/acceuil",
+      "destination": "/axis-store acceuil.html"
+    },
+    {
+      "source": "/catalogue",
+      "destination": "/axis-store catalogue.html"
+    },
+    {
+      "source": "/",
+      "destination": "/axis-store acceuil.html"
+    }
+  ]
+}
