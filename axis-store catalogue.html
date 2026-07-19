@@ -265,10 +265,12 @@
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT AVEC CORRECTIONS COMPTEUR ET CROIX (❌) -->
+    <!-- LOGIQUE FIREBASE AVEC SÉCURISATION AUTHENTICATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        // Importation du module d'authentification
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         const firebaseConfig = {
             databaseURL: "https://axis-store-829fb-default-rtdb.firebaseio.com/"
@@ -276,9 +278,9 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app); // Initialisation de l'authentification
 
         window.MERCHANT_NUMBER = "2250720648060"; 
-        window.ADMIN_PASSWORD = "LBG@.COM"; 
         
         window.cart = [];
         window.productsData = [];
@@ -414,14 +416,25 @@
             });
         }
 
+        // Connexion sécurisée via Firebase Auth
         window.loginAdmin = function() {
-            const entry = prompt("Entrez votre mot de passe administrateur AXIS STORE :");
-            if (entry === window.ADMIN_PASSWORD) {
-                window.isAdminLoggedIn = true;
-                document.getElementById('admin-panel').style.display = 'block';
-                window.renderCatalog();
-                window.renderAdminTable();
-            }
+            const email = prompt("Entrez l'adresse e-mail administrateur AXIS STORE :");
+            if (!email) return;
+            const password = prompt("Entrez le mot de passe :");
+            if (!password) return;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    window.isAdminLoggedIn = true;
+                    document.getElementById('admin-panel').style.display = 'block';
+                    window.renderCatalog();
+                    window.renderAdminTable();
+                    alert("Connexion réussie ! Bienvenue sur l'espace de gestion.");
+                })
+                .catch((error) => {
+                    alert("Accès refusé : Identifiants incorrects.");
+                    console.error("Erreur Auth : ", error.message);
+                });
         }
 
         window.renderAdminTable = function() {
@@ -468,6 +481,8 @@
             update(ref(db), updates).then(() => {
                 alert("Modifications enregistrées !");
                 document.getElementById('admin-panel').style.display = 'none';
+            }).catch((err) => {
+                alert("Erreur lors de l'enregistrement. Vérifiez vos droits Firebase.");
             });
         }
 
