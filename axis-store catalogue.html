@@ -89,8 +89,6 @@
             max-width: 100%; 
             max-height: 100%; 
             object-fit: contain; 
-            opacity: 1 !important; 
-            visibility: visible !important;
         }
 
         .badge-expert { 
@@ -105,24 +103,6 @@
             font-weight: bold;
             z-index: 5;
         }
-        
-        .btn-quick-edit {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #39ff14;
-            color: #000;
-            border: none;
-            padding: 6px 10px;
-            font-size: 0.75em;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .btn-quick-edit:hover { background: #2bdc0f; }
 
         .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
         .brand { font-size: 0.8em; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 1px; }
@@ -141,19 +121,9 @@
         .cart-container { flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; height: max-content; position: sticky; top: 100px; }
         .cart-container h2 { font-size: 1.3em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #111; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.95em; }
-        .cart-item-detail { display: flex; align-items: center; gap: 8px; }
         .cart-item-meta { font-size: 0.8em; color: #666; display: block; margin-top: 2px; }
         
-        .btn-remove { 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 1.2rem; 
-            display: inline-block;
-            line-height: 1;
-            padding: 2px 5px;
-        }
-        
+        .btn-remove { background: none; border: none; cursor: pointer; font-size: 1.2rem; display: inline-block; line-height: 1; padding: 2px 5px; }
         .cart-total { font-size: 1.2em; font-weight: bold; margin-top: 15px; text-align: right; color: #111; }
         
         .form-group { margin-top: 15px; }
@@ -164,22 +134,6 @@
         .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
         .btn-order:hover { background: #128c7e; }
         .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; }
-
-        .admin-trigger-zone { text-align: center; margin-top: 60px; padding: 20px 0; border-top: 1px dashed #333; }
-        .btn-admin-login { background: none; border: none; color: #666; font-size: 0.8rem; cursor: pointer; text-decoration: underline; }
-        
-        .admin-panel { display: none; background: #1a1a1a; color: #fff; padding: 30px; border-radius: 10px; margin-top: 30px; border: 2px solid #39ff14; }
-        .admin-panel h2 { color: #39ff14; margin-bottom: 20px; font-size: 1.4rem; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; color: #fff; font-size: 0.85rem; }
-        .admin-table th, .admin-table td { padding: 10px; border: 1px solid #333; text-align: left; vertical-align: middle; }
-        .admin-table th { background: #222; color: #39ff14; }
-        .admin-table input, .admin-table select { background: #2b2b2b; color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 100%; }
-        .admin-supp-box { margin-top: 5px; display: flex; gap: 5px; flex-direction: column; font-size: 0.75rem; }
-        .admin-supp-box div { display: flex; align-items: center; justify-content: space-between; }
-        .admin-supp-box input { width: 70px; padding: 2px; }
-        
-        .btn-save-admin { background: #39ff14; color: #000; border: none; padding: 12px 25px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.95rem; }
-        .btn-save-admin:hover { background: #2bdc0f; }
 
         footer { text-align: center; padding: 20px; margin-top: 40px; color: #666; border-top: 1px solid #222; }
 
@@ -194,7 +148,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a href="#">Accueil</a></li>
                 <li><a href="#" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -208,7 +162,7 @@
     <div class="main-container">
         <div class="catalog-container">
             <div class="catalog-grid" id="catalog-products">
-                <p style="color: #fff; text-align: center; width: 100%;">Connexion à la base de données...</p>
+                <p style="color: #fff; text-align: center; width: 100%;">Chargement du catalogue...</p>
             </div>
         </div>
 
@@ -235,43 +189,14 @@
         </div>
     </div>
 
-    <div class="admin-trigger-zone">
-        <button class="btn-admin-login" id="admin-action-btn" onclick="toggleAdminAuth()">🔑 Accéder à l'espace de gestion (Privé)</button>
-    </div>
-
-    <div class="admin-panel" id="admin-panel">
-        <h2>PANNEAU DE GESTION DES ARTICLES (AXIS STORE)</h2>
-        <div style="overflow-x: auto;">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">ID</th>
-                        <th style="width: 20%;">Nom du modèle</th>
-                        <th style="width: 25%;">Lien Photo (URL)</th>
-                        <th style="width: 15%;">Prix de Base (FCFA)</th>
-                        <th style="width: 15%;">Type Matériau</th>
-                        <th style="width: 20%;">Suppléments Qualité (FCFA)</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-table-body">
-                    <!-- Généré dynamiquement -->
-                </tbody>
-            </table>
-        </div>
-        <button class="btn-save-admin" onclick="saveAdminChanges()">ENREGISTRER LES MODIFICATIONS</button>
-    </div>
-
     <footer>
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
-    <!-- LOGIQUE JAVASCRIPT CORRIGÉE ET SECURISÉE AVEC FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-        // Ta configuration Firebase complète
         const firebaseConfig = {
             apiKey: "AIzaSyD8mFRkNYjYTF_g4AWttKrHccY9H-AWN54",
             authDomain: "axis-store-829fb.firebaseapp.com",
@@ -284,29 +209,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const auth = getAuth(app);
 
         window.MERCHANT_NUMBER = "2250720648060"; 
-        
         window.cart = [];
         window.productsData = [];
-        window.isAdminLoggedIn = false;
-
-        // Écoute de l'état de connexion de Firebase Authentication
-        onAuthStateChanged(auth, (user) => {
-            const adminBtn = document.getElementById('admin-action-btn');
-            if (user && user.uid === 'LiPMCiiqIUNGVutGlCVbCkLieUO2') {
-                window.isAdminLoggedIn = true;
-                if(adminBtn) adminBtn.innerText = "🔒 Se déconnecter de l'espace Admin";
-                document.getElementById('admin-panel').style.display = 'block';
-            } else {
-                window.isAdminLoggedIn = false;
-                if(adminBtn) adminBtn.innerText = "🔑 Accéder à l'espace de gestion (Privé)";
-                document.getElementById('admin-panel').style.display = 'none';
-            }
-            renderCatalog();
-            if (window.isAdminLoggedIn) renderAdminTable();
-        });
 
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
@@ -314,38 +220,8 @@
             if (data) {
                 window.productsData = Object.values(data).filter(p => p !== null);
                 renderCatalog();
-                if (window.isAdminLoggedIn) {
-                    renderAdminTable();
-                }
-            } else {
-                initFirebaseDefaultProducts();
             }
         });
-
-        function initFirebaseDefaultProducts() {
-            const baseProducts = [
-                { id: 1, name: "T-Shirt Auras Rick Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500" },
-                { id: 2, name: "T-Shirt Auras One Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Top Vente", image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500" },
-                { id: 3, name: "T-Shirt Auras Rick Noir", price: 15000, type: "coton", cat: "Streetwear", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500" }
-            ];
-
-            const initialProducts = {};
-            for (let i = 1; i <= 30; i++) {
-                const template = baseProducts[(i - 1) % baseProducts.length];
-                initialProducts[`prod_${i}`] = {
-                    id: i,
-                    badge: template.badge,
-                    category: template.cat,
-                    name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
-                    price: template.price,
-                    image: template.image,
-                    qualityType: template.type,
-                    suppCoton: 0,
-                    suppNylon: 3000
-                };
-            }
-            set(ref(db, 'products'), initialProducts);
-        }
 
         window.renderCatalog = function() {
             const catalogContainer = document.getElementById('catalog-products');
@@ -356,27 +232,20 @@
                 const sc = prod.suppCoton || 0;
                 const sn = prod.suppNylon || 0;
 
-                let qualityOptionsHtml = '';
-                if(prod.qualityType === "nylon") {
-                    qualityOptionsHtml = `
-                        <option value="Coton Standard" data-extra="${sc}">Coton Classique (+${sc} FCFA)</option>
-                        <option value="Nylon Premium" data-extra="${sn}" selected>Nylon Premium (+${sn} FCFA)</option>
-                    `;
-                } else {
-                    qualityOptionsHtml = `
-                        <option value="Coton Standard" data-extra="${sc}" selected>Coton Classique (+${sc} FCFA)</option>
-                        <option value="Nylon Standard" data-extra="${sn}">Nylon Basique (+${sn} FCFA)</option>
-                    `;
-                }
+                let qualityOptionsHtml = prod.qualityType === "nylon" ? `
+                    <option value="Coton Standard" data-extra="${sc}">Coton Classique (+${sc} FCFA)</option>
+                    <option value="Nylon Premium" data-extra="${sn}" selected>Nylon Premium (+${sn} FCFA)</option>
+                ` : `
+                    <option value="Coton Standard" data-extra="${sc}" selected>Coton Classique (+${sc} FCFA)</option>
+                    <option value="Nylon Standard" data-extra="${sn}">Nylon Basique (+${sn} FCFA)</option>
+                `;
 
                 const defaultExtra = prod.qualityType === "nylon" ? sn : sc;
                 const finalPrice = prod.price + defaultExtra;
                 const safeName = prod.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                const editBtnStyle = window.isAdminLoggedIn ? 'display: block;' : 'display: none;';
 
                 catalogContainer.innerHTML += `
                     <div class="product-card">
-                        <button class="btn-quick-edit" style="${editBtnStyle}" onclick="quickEditProduct(${prod.id})">⚙️ Modifier</button>
                         <div class="image-container">
                             <span class="badge-expert">${prod.badge}</span>
                             <img src="${prod.image}" alt="${prod.name}">
@@ -397,7 +266,6 @@
                                         <option value="XL">XL</option>
                                     </select>
                                 </div>
-                                
                                 <div class="option-group">
                                     <label for="quality-${prod.id}">Qualité :</label>
                                     <select id="quality-${prod.id}" class="option-select" onchange="adjustPrice(${prod.id}, ${prod.price})">
@@ -405,102 +273,11 @@
                                     </select>
                                 </div>
                             </div>
-                            
                             <button class="btn-add" onclick="prepareAddToCart(${prod.id}, '${safeName}', ${prod.price})">AJOUTER AU PANIER</button>
                         </div>
                     </div>
                 `;
             });
-        }
-
-        window.quickEditProduct = function(productId) {
-            const prod = window.productsData.find(p => p.id === productId);
-            if (!prod) return;
-
-            const newName = prompt(`Modifier le NOM :`, prod.name);
-            if (newName === null) return;
-
-            const newPriceStr = prompt(`Modifier le PRIX DE BASE :`, prod.price);
-            if (newPriceStr === null) return;
-            const newPrice = parseInt(newPriceStr) || 0;
-
-            const newBadge = prompt(`Modifier le BADGE :`, prod.badge);
-            if (newBadge === null) return;
-
-            const newImage = prompt(`Modifier le LIEN DE L'IMAGE :`, prod.image);
-            if (newImage === null) return;
-
-            update(ref(db, `products/prod_${productId}`), {
-                name: newName,
-                price: newPrice,
-                badge: newBadge,
-                image: newImage
-            }).catch(err => alert("Erreur Firebase : " + err.message));
-        }
-
-        window.toggleAdminAuth = function() {
-            if (window.isAdminLoggedIn) {
-                signOut(auth).then(() => {
-                    alert("Déconnexion réussie !");
-                });
-            } else {
-                const email = prompt("Entrez votre e-mail administrateur :", "labaguettenguessan@gmail.com");
-                if (!email) return;
-                const password = prompt("Entrez votre mot de passe secret :");
-                if (!password) return;
-
-                signInWithEmailAndPassword(auth, email, password)
-                    .then(() => {
-                        alert("Connexion Firebase réussie !");
-                    })
-                    .catch(err => alert("Erreur d'authentification : " + err.message));
-            }
-        }
-
-        window.renderAdminTable = function() {
-            const tableBody = document.getElementById('admin-table-body');
-            if (!tableBody) return;
-            tableBody.innerHTML = "";
-
-            window.productsData.forEach(prod => {
-                tableBody.innerHTML += `
-                    <tr>
-                        <td><strong>${prod.id}</strong></td>
-                        <td><input type="text" id="edit-name-${prod.id}" value="${prod.name}"></td>
-                        <td><input type="text" id="edit-image-${prod.id}" value="${prod.image}"></td>
-                        <td><input type="number" id="edit-price-${prod.id}" value="${prod.price}"></td>
-                        <td>
-                            <select id="edit-qualitytype-${prod.id}">
-                                <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Gamme Coton</option>
-                                <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Gamme Nylon</option>
-                            </select>
-                        </td>
-                        <td>
-                            <div class="admin-supp-box">
-                                <div>Coton: <input type="number" id="edit-supp-coton-${prod.id}" value="${prod.suppCoton || 0}"></div>
-                                <div>Nylon: <input type="number" id="edit-supp-nylon-${prod.id}" value="${prod.suppNylon || 0}"></div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        window.saveAdminChanges = function() {
-            const updates = {};
-            window.productsData.forEach(prod => {
-                const id = prod.id;
-                updates[`products/prod_${id}/name`] = document.getElementById(`edit-name-${id}`).value;
-                updates[`products/prod_${id}/image`] = document.getElementById(`edit-image-${id}`).value;
-                updates[`products/prod_${id}/price`] = parseInt(document.getElementById(`edit-price-${id}`).value) || 0;
-                updates[`products/prod_${id}/qualityType`] = document.getElementById(`edit-qualitytype-${id}`).value;
-                updates[`products/prod_${id}/suppCoton`] = parseInt(document.getElementById(`edit-supp-coton-${id}`).value) || 0;
-                updates[`products/prod_${id}/suppNylon`] = parseInt(document.getElementById(`edit-supp-nylon-${id}`).value) || 0;
-            });
-
-            update(ref(db), updates).then(() => {
-                alert("Modifications enregistrées sur Firebase !");
-            }).catch(err => alert("Erreur de sauvegarde : " + err.message));
         }
 
         window.adjustPrice = function(productId, originalPrice) {
@@ -515,17 +292,12 @@
             const qualityElement = document.getElementById(`quality-${productId}`);
             const qualityLabel = qualityElement.options[qualityElement.selectedIndex].text.split(' (')[0];
             const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
-            const safeName = name.replace(/'/g, "\\'");
-            window.addToCart(safeName, originalPrice + extra, size, qualityLabel);
+            window.addToCart(name, originalPrice + extra, size, qualityLabel);
         }
 
         window.addToCart = function(name, price, size, quality) {
             const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
-            if (existingItem) { 
-                existingItem.quantity += 1; 
-            } else { 
-                window.cart.push({ name, price, size, quality, quantity: 1 }); 
-            }
+            if (existingItem) { existingItem.quantity += 1; } else { window.cart.push({ name, price, size, quality, quantity: 1 }); }
             window.updateCartUI();
         }
 
@@ -534,18 +306,14 @@
             window.updateCartUI();
         }
 
-        window.clearCart = function() {
-            window.cart = [];
-            window.updateCartUI();
-        }
+        window.clearCart = function() { window.cart = []; window.updateCartUI(); }
 
         window.updateCartUI = function() {
             const cartItemsDiv = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const countSpan = document.getElementById('cart-count');
             const countNavSpan = document.getElementById('cart-count-nav');
-            let total = 0;
-            let totalItems = 0;
+            let total = 0; let totalItems = 0;
 
             if (window.cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
@@ -559,10 +327,8 @@
             window.cart.forEach(item => {
                 total += item.price * item.quantity;
                 totalItems += item.quantity;
-                
                 const safeName = item.name.replace(/'/g, "\\'");
                 const safeQuality = item.quality.replace(/'/g, "\\'");
-                
                 cartItemsDiv.innerHTML += `
                     <div class="cart-item">
                         <div>
@@ -571,12 +337,11 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
-                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:red; padding:2px 5px;">❌</button>
+                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="color:red;">❌</button>
                         </div>
                     </div>
                 `;
             });
-            
             cartTotal.innerText = total.toLocaleString();
             if(countSpan) countSpan.innerText = totalItems;
             if(countNavSpan) countNavSpan.innerText = totalItems;
@@ -585,41 +350,21 @@
         window.sendOrder = function() {
             const name = document.getElementById('client-name').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
+            if (window.cart.length === 0 || !name || !delivery) return alert("Remplissez vos infos et votre panier.");
 
-            if (window.cart.length === 0) {
-                alert("Votre panier est vide !");
-                return;
-            }
-            if (!name || !delivery) {
-                alert("Veuillez renseigner votre nom et votre adresse de livraison.");
-                return;
-            }
-
-            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n`;
-            message += `👤 *Client :* ${name}\n`;
-            message += `📍 *Livraison :* ${delivery}\n\n`;
-            message += `📦 *Articles :*\n`;
-
+            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📍 *Livraison :* ${delivery}\n\n📦 *Articles :*\n`;
             let total = 0;
             window.cart.forEach(item => {
-                const subtotal = item.price * item.quantity;
-                total += subtotal;
+                const subtotal = item.price * item.quantity; total += subtotal;
                 message += `- ${item.name} (x${item.quantity}) | Taille: ${item.size} | ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
             });
-
             message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
-            
-            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
+            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
-        // Ancre de défilement fluide
         document.getElementById('cart-nav-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
+            e.preventDefault(); document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
         });
-
-        window.updateCartUI();
     </script>
 </body>
 </html>
