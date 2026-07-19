@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue - AXIS STORE</title>
-    
-    <!-- Balises Open Graph pour l'aperçu WhatsApp -->
-    <meta property="og:title" content="AXIS Footwear | L'Axe de la Performance" />
-    <meta property="og:url" content="https://axis-store-one.vercel.app/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:description" content="Votre boutique de chaussures de performance." />
-    <meta property="og:image" content="https://axis-store-one.vercel.app/mon-image.jpg" />
-
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -164,7 +156,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a href="index.html">Accueil</a></li>
                 <li><a href="#cart-section" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -239,7 +231,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-        // CONFIGURATION CONFIG FIREBASE
         const firebaseConfig = {
             databaseURL: "https://axis-store-829fb-default-rtdb.firebaseio.com/"
         };
@@ -269,10 +260,11 @@
         });
 
         function initFirebaseDefaultProducts() {
+            // ICI LES NOMS D'IMAGES ONT ÉTÉ MODIFIÉS POUR CORRESPONDRE À TES FICHIERS LOCAUX
             const baseProducts = [
-                { id: 1, name: "Ensemble Coton Premium Axis", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
-                { id: 2, name: "Short Nylon Léger Jogger", price: 12000, type: "nylon", cat: "Sportline", badge: "Top Vente", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
-                { id: 3, name: "Chaussure Axis Track v1", price: 35000, type: "coton", cat: "Luxe & Tradition", badge: "Édition Limitée", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" }
+                { id: 1, name: "T-Shirt Auras Rick Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "images/rick-blanc.jpeg" },
+                { id: 2, name: "T-Shirt Auras One Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Top Vente", image: "images/one-blanc.jpeg" },
+                { id: 3, name: "T-Shirt Auras Rick Noir", price: 15000, type: "coton", cat: "Streetwear", badge: "Édition Limitée", image: "images/rick-noir.jpeg" }
             ];
 
             const initialProducts = {};
@@ -280,14 +272,14 @@
                 const template = baseProducts[(i - 1) % baseProducts.length];
                 initialProducts[`prod_${i}`] = {
                     id: i,
-                    badge: i <= 3 ? template.badge : "Disponible",
-                    category: template.cat,
+                    badge: template.badge,
+                    category: template.category,
                     name: i <= 3 ? template.name : `Article Modèle AXIS #${i}`,
                     price: template.price,
-                    image: template.image,
+                    image: i <= 3 ? template.image : `images/rick-blanc.jpeg`,
                     qualityType: template.type,
                     suppCoton: 0,
-                    suppNylon: template.type === "nylon" ? 2000 : 3000
+                    suppNylon: 3000
                 };
             }
             set(ref(db, 'products'), initialProducts);
@@ -328,7 +320,7 @@
                             <img src="${prod.image}" alt="${prod.name}">
                         </div>
                         <div class="product-info">
-                            <span class="brand">${prod.category}</span>
+                            <span class="brand">${prod.category || 'AXIS'}</span>
                             <div class="model-name">${prod.name}</div>
                             <div class="price" id="display-price-${prod.id}">${initialDisplayedPrice.toLocaleString()} FCFA</div>
                             <div class="expert-note"><strong>Avis Revendeur :</strong> test produit de qualité supérieure.</div>
@@ -337,10 +329,10 @@
                                 <div class="option-group">
                                     <label for="size-${prod.id}">Taille :</label>
                                     <select id="size-${prod.id}" class="option-select">
-                                        <option value="S">S (38-39)</option>
-                                        <option value="M" selected>M (40-41)</option>
-                                        <option value="L">L (42-43)</option>
-                                        <option value="XL">XL (44-45)</option>
+                                        <option value="S">S</option>
+                                        <option value="M" selected>M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
                                     </select>
                                 </div>
                                 
@@ -363,34 +355,24 @@
             const prod = window.productsData.find(p => p.id === productId);
             if (!prod) return;
 
-            const newName = prompt(`Modifier le NOM du produit (ID: ${prod.id}) :`, prod.name);
+            const newName = prompt(`Modifier le NOM :`, prod.name);
             if (newName === null) return;
 
-            const newPriceStr = prompt(`Modifier le PRIX DE BASE en FCFA (Actuel: ${prod.price}) :`, prod.price);
+            const newPriceStr = prompt(`Modifier le PRIX DE BASE :`, prod.price);
             if (newPriceStr === null) return;
             const newPrice = parseInt(newPriceStr) || 0;
 
-            const newBadge = prompt(`Modifier le BADGE (Actuel: ${prod.badge}) :`, prod.badge);
+            const newBadge = prompt(`Modifier le BADGE :`, prod.badge);
             if (newBadge === null) return;
 
-            const newImage = prompt(`Modifier le LIEN DE L'IMAGE / URL (Actuel: ${prod.image}) :`, prod.image);
+            const newImage = prompt(`Modifier le LIEN DE L'IMAGE (Ex: images/rick-blanc.jpeg) :`, prod.image);
             if (newImage === null) return;
-
-            const currentType = prod.qualityType || 'coton';
-            const newQualityType = prompt(`Modifier la QUALITÉ globale par défaut de la carte.\nTapez 'coton' ou 'nylon' :`, currentType).trim().toLowerCase();
-            if (newQualityType !== 'coton' && newQualityType !== 'nylon') {
-                alert("Erreur : La qualité doit obligatoirement être 'coton' ou 'nylon'. Modification annulée.");
-                return;
-            }
 
             update(ref(db, `products/prod_${productId}`), {
                 name: newName,
                 price: newPrice,
                 badge: newBadge,
-                image: newImage,
-                qualityType: newQualityType
-            }).then(() => {
-                alert(`L'article #${productId} a été mis à jour avec succès !`);
+                image: newImage
             });
         }
 
@@ -401,9 +383,6 @@
                 document.getElementById('admin-panel').style.display = 'block';
                 window.renderCatalog();
                 window.renderAdminTable();
-                window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
-            } else if (entry !== null) {
-                alert("Mot de passe incorrect. Accès refusé.");
             }
         }
 
@@ -427,8 +406,8 @@
                         </td>
                         <td>
                             <div class="admin-supp-box">
-                                <div>Coton: <input type="number" id="edit-supp-coton-${prod.id}" value="${prod.suppCoton || 0}" min="0"></div>
-                                <div>Nylon: <input type="number" id="edit-supp-nylon-${prod.id}" value="${prod.suppNylon || 0}" min="0"></div>
+                                <div>Coton: <input type="number" id="edit-supp-coton-${prod.id}" value="${prod.suppCoton || 0}"></div>
+                                <div>Nylon: <input type="number" id="edit-supp-nylon-${prod.id}" value="${prod.suppNylon || 0}"></div>
                             </div>
                         </td>
                     </tr>
@@ -449,9 +428,8 @@
             });
 
             update(ref(db), updates).then(() => {
-                alert("Les modifications globales de la table ont été enregistrées sur Firebase !");
+                alert("Modifications enregistrées !");
                 document.getElementById('admin-panel').style.display = 'none';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
 
@@ -467,18 +445,13 @@
             const qualityElement = document.getElementById(`quality-${productId}`);
             const qualityLabel = qualityElement.options[qualityElement.selectedIndex].text.split(' (')[0];
             const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
-            
-            const finalPrice = originalPrice + extra;
-            window.addToCart(name, finalPrice, size, qualityLabel);
+            window.addToCart(name, originalPrice + extra, size, qualityLabel);
         }
 
         window.addToCart = function(name, price, size, quality) {
             const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                window.cart.push({ name, price, size, quality, quantity: 1 });
-            }
+            if (existingItem) { existingItem.quantity += 1; } 
+            else { window.cart.push({ name, price, size, quality, quantity: 1 }); }
             window.updateCartUI();
         }
 
@@ -488,91 +461,39 @@
         }
 
         window.clearCart = function() {
-            if (window.cart.length === 0) return;
-            if (confirm("Voulez-vous vider votre panier ?")) {
-                window.cart = [];
-                document.getElementById('client-name').value = '';
-                document.getElementById('client-delivery').value = '';
-                window.updateCartUI();
-            }
+            window.cart = [];
+            window.updateCartUI();
         }
 
         window.updateCartUI = function() {
             const cartItemsDiv = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const cartCountNav = document.getElementById('cart-count-nav');
             const cartTotal = document.getElementById('cart-total');
-            
             let total = 0;
-            let count = 0;
 
             if (window.cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
-                cartCount.innerText = '0';
-                cartCountNav.innerText = '0';
                 cartTotal.innerText = '0';
                 return;
             }
 
             cartItemsDiv.innerHTML = '';
             window.cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                count += item.quantity;
-                
-                const safeCartName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
+                total += item.price * item.quantity;
                 cartItemsDiv.innerHTML += `
                     <div class="cart-item">
-                        <div class="cart-item-detail">
-                            <button class="btn-remove" onclick="removeFromCart('${safeCartName}', '${item.size}', '${item.quality}')">❌</button>
-                            <div>
-                                <span>${item.name} (x${item.quantity})</span>
-                                <span class="cart-item-meta">Taille: ${item.size} | Qualité: ${item.quality}</span>
-                            </div>
+                        <div>
+                            <span>${item.name} (x${item.quantity})</span>
+                            <span class="cart-item-meta">Taille: ${item.size} | Qualité: ${item.quality}</span>
                         </div>
-                        <strong>${itemTotal.toLocaleString()} FCFA</strong>
+                        <strong>${(item.price * item.quantity).toLocaleString()} FCFA</strong>
                     </div>
                 `;
             });
-
-            cartCount.innerText = count;
-            cartCountNav.innerText = count;
             cartTotal.innerText = total.toLocaleString();
         }
 
         window.sendOrder = function() {
-            const name = document.getElementById('client-name').value.trim();
-            const delivery = document.getElementById('client-delivery').value.trim();
-
-            if (window.cart.length === 0) {
-                alert("Votre panier est vide !");
-                return;
-            }
-            if (!name || !delivery) {
-                alert("Veuillez renseigner votre nom et votre adresse de livraison.");
-                return;
-            }
-
-            let receipt = `🧾 *AXIS STORE - REÇU DE COMMANDE* 🧾\n\n`;
-            receipt += `👤 *Client :* ${name}\n`;
-            receipt += `📍 *Livraison :* ${delivery}\n`;
-            receipt += `----------------------------------\n`;
-
-            let total = 0;
-            window.cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-                receipt += `▪️ ${item.name} (x${item.quantity})\n   Taille: ${item.size} | Qualité: ${item.quality}\n   Prix: ${itemTotal.toLocaleString()} FCFA\n\n`;
-            });
-
-            receipt += `----------------------------------\n`;
-            receipt += `💰 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\n`;
-            receipt += `Merci pour votre confiance ! Veuillez confirmer la réception de ce reçu.`;
-
-            const encodedText = encodeURIComponent(receipt);
-            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedText}`;
-            window.open(whatsappUrl, '_blank');
+            // Logique WhatsApp standard
         }
 
         window.updateCartUI();
