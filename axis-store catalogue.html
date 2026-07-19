@@ -73,37 +73,39 @@
             position: relative;
         }
         .product-card:hover { transform: translateY(-3px); }
-     .image-container { 
-    position: relative; 
-    width: 100%; 
-    height: 240px; 
-    background: #f0f0f0; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
+        
+        .image-container { 
+            position: relative; 
+            width: 100%; 
+            height: 240px; 
+            background: #f0f0f0; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-.image-container img { 
-    max-width: 100%; 
-    max-height: 100%; 
-    object-fit: contain; 
-    opacity: 1 !important; 
-    visibility: visible !important;
-}
+        .image-container img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; 
+            opacity: 1 !important; 
+            visibility: visible !important;
+        }
 
-.badge-expert { 
-    position: absolute; 
-    top: 10px; 
-    left: 10px; 
-    background: #e67e22; 
-    color: white; 
-    font-size: 0.75em; 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-    font-weight: bold;
-    z-index: 5; /* Force le badge à passer au-dessus de l'image et du fond */
-}
+        .badge-expert { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            background: #e67e22; 
+            color: white; 
+            font-size: 0.75em; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-weight: bold;
+            z-index: 5;
+        }
+        
         .btn-quick-edit {
             display: none;
             position: absolute;
@@ -183,7 +185,7 @@
         <nav>
             <ul>
                 <li><a href="axis-store acceuil.html">Accueil</a></li>
-                <li><a href="" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
+                <li><a href="#" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
         </nav>
@@ -253,6 +255,7 @@
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
+    <!-- LE SCRIPT ENTIÈREMENT INTRODUIT ET CORRIGÉ POUR LE PANIER -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -286,7 +289,6 @@
         });
 
         function initFirebaseDefaultProducts() {
-            // Utilisation de liens internet stables pour éviter les bugs de dossiers locaux
             const baseProducts = [
                 { id: 1, name: "T-Shirt Auras Rick Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Nouvelle Collection", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500" },
                 { id: 2, name: "T-Shirt Auras One Blanc", price: 15000, type: "coton", cat: "Streetwear", badge: "Top Vente", image: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500" },
@@ -471,13 +473,17 @@
             const qualityElement = document.getElementById(`quality-${productId}`);
             const qualityLabel = qualityElement.options[qualityElement.selectedIndex].text.split(' (')[0];
             const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
-            window.addToCart(name, originalPrice + extra, size, qualityLabel);
+            const safeName = name.replace(/'/g, "\\'");
+            window.addToCart(safeName, originalPrice + extra, size, qualityLabel);
         }
 
         window.addToCart = function(name, price, size, quality) {
             const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
-            if (existingItem) { existingItem.quantity += 1; } 
-            else { window.cart.push({ name, price, size, quality, quantity: 1 }); }
+            if (existingItem) { 
+                existingItem.quantity += 1; 
+            } else { 
+                window.cart.push({ name, price, size, quality, quantity: 1 }); 
+            }
             window.updateCartUI();
         }
 
@@ -494,32 +500,75 @@
         window.updateCartUI = function() {
             const cartItemsDiv = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
+            const countSpan = document.getElementById('cart-count');
+            const countNavSpan = document.getElementById('cart-count-nav');
             let total = 0;
+            let totalItems = 0;
 
             if (window.cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
                 cartTotal.innerText = '0';
+                if(countSpan) countSpan.innerText = '0';
+                if(countNavSpan) countNavSpan.innerText = '0';
                 return;
             }
 
             cartItemsDiv.innerHTML = '';
             window.cart.forEach(item => {
                 total += item.price * item.quantity;
+                totalItems += item.quantity;
+                
+                const safeName = item.name.replace(/'/g, "\\'");
+                const safeQuality = item.quality.replace(/'/g, "\\'");
+                
                 cartItemsDiv.innerHTML += `
                     <div class="cart-item">
                         <div>
                             <span>${item.name} (x${item.quantity})</span>
-                            <span class="cart-item-meta">Taille: ${item.size} | Qualité: ${item.quality}</span>
+                            <span class="cart-item-meta">Taille: ${item.size} | ${item.quality}</span>
                         </div>
-                        <strong>${(item.price * item.quantity).toLocaleString()} FCFA</strong>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
+                            <button class="btn-remove" onclick="removeFromCart('${safeName}', '${item.size}', '${safeQuality}')">❌</button>
+                        </div>
                     </div>
                 `;
             });
+            
             cartTotal.innerText = total.toLocaleString();
+            if(countSpan) countSpan.innerText = totalItems;
+            if(countNavSpan) countNavSpan.innerText = totalItems;
         }
 
         window.sendOrder = function() {
-            // Logique de commande WhatsApp standard
+            const name = document.getElementById('client-name').value.trim();
+            const delivery = document.getElementById('client-delivery').value.trim();
+
+            if (window.cart.length === 0) {
+                alert("Votre panier est vide !");
+                return;
+            }
+            if (!name || !delivery) {
+                alert("Veuillez renseigner votre nom et votre adresse de livraison.");
+                return;
+            }
+
+            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n`;
+            message += `👤 *Client :* ${name}\n`;
+            message += `📍 *Livraison :* ${delivery}\n\n`;
+            message += `📦 *Articles :*\n`;
+
+            let total = 0;
+            window.cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                message += `- ${item.name} (x${item.quantity}) | Taille: ${item.size} | ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
+            });
+
+            message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
+            
+            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
         }
 
         window.updateCartUI();
