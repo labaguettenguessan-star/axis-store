@@ -4,72 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axis Store</title>
-    <!-- Chargement de Firebase -->
+    <!-- Chargement de Firebase (version Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
-        .admin-box { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .admin-box { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
         .hidden { display: none !important; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; background: #007bff; color: white; }
+        button:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #bd2130; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
     </style>
 </head>
 <body>
 
     <h1>Bienvenue sur Axis Store</h1>
 
-    <!-- ZONE D'ADMINISTRATION (Visible publiquement pour se connecter, mais le formulaire d'ajout reste caché) -->
+    <!-- ZONE D'ADMINISTRATION (Visible pour se connecter, outils masqués par défaut) -->
     <div class="admin-box">
         <!-- Formulaire de connexion -->
         <div id="login-form">
+            <h3>🔑 Espace Connexion Admin</h3>
             <input type="email" id="email" placeholder="Email Admin">
             <input type="password" id="password" placeholder="Mot de passe">
-            <button onclick="login()">Connexion Admin</button>
+            <button onclick="login()">Connexion</button>
         </div>
 
-        <!-- Statut connecté et bouton d'ajout (Cachés par défaut) -->
+        <!-- Outils de gestion (Accessibles uniquement après connexion) -->
         <div id="admin-logged" class="hidden">
-            <p>Connecté en tant que admin (<span id="user-display"></span>) <button onclick="logout()">Déconnexion</button></p>
+            <p>Connecté en tant que admin : <strong id="user-display"></strong> <button class="btn-danger" onclick="logout()">Déconnexion</button></p>
             
             <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                <h3>Ajouter un produit</h3>
+                <h3>📦 Ajouter un produit au catalogue</h3>
                 <input type="text" id="prod-name" placeholder="Nom du produit">
-                <input type="number" id="prod-price" placeholder="Prix">
-                <button onclick="addProduct()">Publier sur le site</button>
+                <input type="number" id="prod-price" placeholder="Prix (FCFA)">
+                <button class="btn-success" onclick="addProduct()">Mettre en ligne</button>
             </div>
         </div>
     </div>
 
-    <!-- CATALOGUE PUBLIC (Toujours visible par tout le monde) -->
+    <!-- CATALOGUE PUBLIC (Toujours visible par les clients) -->
     <h2>Notre Catalogue</h2>
     <div id="catalog-grid" class="grid">
-        <!-- Les produits vont s'afficher ici automatiquement -->
         <p id="loading-text">Chargement des produits...</p>
     </div>
 
     <script>
-        // Ta configuration Firebase
+        // Ta configuration Firebase officielle
         const firebaseConfig = {
-            apiKey: "TON_API_KEY",
+            apiKey: "AIzaSyD8mFRkNYjYTF_g4AWttKrHccY9H-AWN54",
             authDomain: "axis-store-829fb.firebaseapp.com",
             databaseURL: "https://axis-store-829fb-default-rtdb.firebaseio.com",
             projectId: "axis-store-829fb",
-            storageBucket: "axis-store-829fb.appspot.com",
-            messagingSenderId: "TON_SENDER_ID",
-            appId: "TON_APP_ID"
+            storageBucket: "axis-store-829fb.firebasestorage.app",
+            messagingSenderId: "724482318031",
+            appId: "1:724482318031:web:c3448b95d73b4f0fade1ba"
         };
 
-        // Initialisation
+        // Initialisation de Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 1. CHARGEMENT PUBLIC DU CATALOGUE (S'exécute pour TOUT LE MONDE)
+        // 1. CHARGEMENT DU CATALOGUE EN TEMPS RÉEL (Public)
         db.ref('products').on('value', (snapshot) => {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = ''; // On vide le texte de chargement
+            grid.innerHTML = '';
             
             if (!snapshot.exists()) {
                 grid.innerHTML = '<p>Aucun produit disponible pour le moment.</p>';
@@ -87,7 +94,7 @@
             });
         });
 
-        // 2. SURVEILLANCE DE LA CONNEXION (Affiche les outils d'ajout uniquement pour toi)
+        // 2. SURVEILLANCE DE L'ÉTAT ADMIN
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-form').classList.add('hidden');
@@ -99,25 +106,27 @@
             }
         });
 
-        // Connexion
+        // Fonction pour se connecter
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            if(!email || !password) return alert("Veuillez remplir les deux champs.");
+
             auth.signInWithEmailAndPassword(email, password)
-                .catch(err => alert("Erreur : " + err.message));
+                .catch(err => alert("Erreur de connexion : " + err.message));
         }
 
-        // Déconnexion
+        // Fonction pour se déconnecter
         function logout() {
             auth.signOut();
         }
 
-        // Ajouter un produit (Sécurisé par tes règles Firebase)
+        // Fonction pour ajouter un produit (Réservée à ton UID)
         function addProduct() {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
 
-            if(!name || !price) return alert("Remplis tous les champs");
+            if(!name || !price) return alert("Remplis le nom et le prix.");
 
             db.ref('products').push({ name, price })
                 .then(() => {
