@@ -143,7 +143,17 @@
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.95em; }
         .cart-item-detail { display: flex; align-items: center; gap: 8px; }
         .cart-item-meta { font-size: 0.8em; color: #666; display: block; margin-top: 2px; }
-        .btn-remove { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1em; }
+        
+        .btn-remove { 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+            display: inline-block;
+            line-height: 1;
+            padding: 2px 5px;
+        }
+        
         .cart-total { font-size: 1.2em; font-weight: bold; margin-top: 15px; text-align: right; color: #111; }
         
         .form-group { margin-top: 15px; }
@@ -255,7 +265,7 @@
         <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
-    <!-- LE SCRIPT ENTIÈREMENT INTRODUIT ET CORRIGÉ POUR LE PANIER -->
+    <!-- LOGIQUE JAVASCRIPT AVEC CORRECTIONS COMPTEUR ET CROIX (❌) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -529,7 +539,7 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
-                            <button class="btn-remove" onclick="removeFromCart('${safeName}', '${item.size}', '${safeQuality}')">❌</button>
+                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="background:none; border:none; cursor:pointer; font-size:1.2rem; color:red; padding:2px 5px;">❌</button>
                         </div>
                     </div>
                 `;
@@ -570,6 +580,12 @@
             const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
         }
+
+        // Ancre de défilement fluide
+        document.getElementById('cart-nav-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
+        });
 
         window.updateCartUI();
     </script>
