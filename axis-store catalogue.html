@@ -178,6 +178,10 @@
                 <input type="text" id="client-name" placeholder="Ex: Jean punk">
             </div>
             <div class="form-group">
+                <label for="client-phone">Numéro de Téléphone :</label>
+                <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
+            </div>
+            <div class="form-group">
                 <label for="client-delivery">Adresse de livraison :</label>
                 <input type="text" id="client-delivery" placeholder="Ex: Abidjan, Cocody">
             </div>
@@ -190,7 +194,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY / PARTENAIRE DE AURAS BOUTIQUE </p>
+        <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
     <script type="module">
@@ -349,10 +353,11 @@
 
         window.sendOrder = function() {
             const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
-            if (window.cart.length === 0 || !name || !delivery) return alert("Remplissez vos infos et votre panier.");
+            if (window.cart.length === 0 || !name || !phone || !delivery) return alert("Remplissez vos infos (Nom, Téléphone, Adresse) et votre panier.");
 
-            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📍 *Livraison :* ${delivery}\n\n📦 *Articles :*\n`;
+            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📞 *Téléphone :* ${phone}\n📍 *Livraison :* ${delivery}\n\n📦 *Articles :*\n`;
             let total = 0;
             window.cart.forEach(item => {
                 const subtotal = item.price * item.quantity; total += subtotal;
