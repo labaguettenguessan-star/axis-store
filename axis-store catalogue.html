@@ -337,7 +337,7 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
-                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="color:red;">❌</button>
+                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="color:red; background:none; border:none; cursor:pointer;">❌</button>
                         </div>
                     </div>
                 `;
