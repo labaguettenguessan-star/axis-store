@@ -5,62 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Privé - AXIS STORE</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #101010; color: #fff; padding: 40px; max-width: 1300px; margin: 0 auto; }
-        h1 { color: #39ff14; text-align: center; margin-bottom: 30px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #101010; color: #fff; padding: 25px; max-width: 1600px; margin: 0 auto; }
+        h1 { color: #39ff14; text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
         .login-box { max-width: 400px; margin: 50px auto; background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #333; text-align: center; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #39ff14; color: black; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        input, select { width: 100%; padding: 8px; margin: 4px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; font-size: 0.85rem; }
+        button { width: 100%; padding: 10px; background: #39ff14; color: black; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.95rem; }
         button:hover { background: #2bdc0f; }
         .hidden { display: none; }
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #333; text-align: left; }
-        .admin-table th { background: #222; color: #39ff14; }
-        .logout-btn { background: #e74c3c; color: white; margin-top: 10px; width: auto; padding: 5px 15px; }
+        
+        .section-block { background: #161616; border: 1px solid #2e2e2e; border-radius: 10px; padding: 20px; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .section-header { border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 15px; }
+        .section-title { color: #39ff14; font-size: 1.3rem; margin: 0; font-weight: bold; }
+        
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th, .admin-table td { padding: 8px 10px; border: 1px solid #333; text-align: left; font-size: 0.85rem; vertical-align: middle; }
+        .admin-table th { background: #222; color: #39ff14; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        
+        .logout-btn { background: #e74c3c; color: white; width: auto; padding: 6px 15px; }
+        .btn-save-section { background: #39ff14; color: #000; margin-top: 15px; width: 100%; padding: 12px; font-size: 1rem; text-transform: uppercase; font-weight: bold; }
+        .btn-delete { background: #e74c3c; color: white; width: auto; padding: 6px 10px; font-size: 0.8rem; }
+        
+        .spec-box { background: #202020; padding: 8px; border-radius: 6px; border: 1px solid #3a3a3a; }
+        .spec-box label { color: #aaa; font-size: 0.72rem; display: block; margin-top: 4px; font-weight: 600; text-transform: uppercase; }
+        .item-index { text-align: center; font-weight: bold; color: #39ff14; }
+        .img-preview { width: 45px; height: 45px; object-fit: cover; border-radius: 4px; border: 1px solid #444; background: #222; }
     </style>
 </head>
 <body>
 
     <h1>🔒 DASHBOARD DE GESTION AXIS STORE</h1>
 
-    <!-- FORMULAIRE DE CONNEXION FIREBASE -->
+    <!-- FORMULAIRE DE CONNEXION -->
     <div id="auth-container" class="login-box">
-        <h2>Connexion Securisée</h2>
+        <h2>Connexion Admin</h2>
         <input type="email" id="admin-email" placeholder="Email Admin" value="labaguettenguessan@gmail.com">
         <input type="password" id="admin-password" placeholder="Mot de passe secret">
         <button onclick="handleLogin()">Se connecter</button>
     </div>
 
-    <!-- TABLEAU DE MODIFICATION -->
+    <!-- DASHBOARD MULTI-SECTIONS -->
     <div id="dashboard-container" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <p>Statut : 🟢 Connecté en tant que gérant.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <p style="margin:0;">Statut : 🟢 Connecté en tant que gérant.</p>
             <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
         </div>
 
-        <div style="overflow-x: auto;">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">ID</th>
-                        <th style="width: 20%;">Nom du modèle</th>
-                        <th style="width: 10%;">Badge (Texte)</th>
-                        <th style="width: 25%;">Lien Photo (URL)</th>
-                        <th style="width: 15%;">Prix de Base (FCFA)</th>
-                        <th style="width: 10%;">Matériau</th>
-                        <th style="width: 15%;">Suppléments (Coton/Nylon)</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <!-- Rempli dynamiquement -->
-                </tbody>
-            </table>
+        <!-- 1. SECTION HABITS (1 à 30) -->
+        <div class="section-block">
+            <div class="section-header">
+                <h2 class="section-title">👕 SECTION HABITS (GRILLE 1 À 30)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">N°</th>
+                            <th style="width: 5%;">Aperçu</th>
+                            <th style="width: 18%;">Nom du modèle</th>
+                            <th style="width: 10%;">Badge</th>
+                            <th style="width: 20%;">Lien Photo (URL)</th>
+                            <th style="width: 10%;">Prix (FCFA)</th>
+                            <th style="width: 28%;">Spécificités Habit</th>
+                            <th style="width: 5%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-habit"></tbody>
+                </table>
+            </div>
+            <button class="btn-save-section" onclick="saveSection('habit')">💾 Enregistrer la section Habits</button>
         </div>
-        <button style="margin-top: 25px;" onclick="saveChanges()">SAUVEGARDER TOUTES LES MODIFICATIONS</button>
+
+        <!-- 2. SECTION CHAUSSURES (1 à 30) -->
+        <div class="section-block">
+            <div class="section-header">
+                <h2 class="section-title">👟 SECTION CHAUSSURES (GRILLE 1 À 30)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">N°</th>
+                            <th style="width: 5%;">Aperçu</th>
+                            <th style="width: 18%;">Nom du modèle</th>
+                            <th style="width: 10%;">Badge</th>
+                            <th style="width: 20%;">Lien Photo (URL)</th>
+                            <th style="width: 10%;">Prix (FCFA)</th>
+                            <th style="width: 28%;">Spécificités Chaussure</th>
+                            <th style="width: 5%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-chaussure"></tbody>
+                </table>
+            </div>
+            <button class="btn-save-section" onclick="saveSection('chaussure')">💾 Enregistrer la section Chaussures</button>
+        </div>
+
+        <!-- 3. SECTION LUNETTES (1 à 30) -->
+        <div class="section-block">
+            <div class="section-header">
+                <h2 class="section-title">🕶️ SECTION LUNETTES (GRILLE 1 À 30)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">N°</th>
+                            <th style="width: 5%;">Aperçu</th>
+                            <th style="width: 18%;">Nom du modèle</th>
+                            <th style="width: 10%;">Badge</th>
+                            <th style="width: 20%;">Lien Photo (URL)</th>
+                            <th style="width: 10%;">Prix (FCFA)</th>
+                            <th style="width: 28%;">Spécificités Lunette</th>
+                            <th style="width: 5%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-lunette"></tbody>
+                </table>
+            </div>
+            <button class="btn-save-section" onclick="saveSection('lunette')">💾 Enregistrer la section Lunettes</button>
+        </div>
+
+        <!-- 4. SECTION SACS (1 à 30) -->
+        <div class="section-block">
+            <div class="section-header">
+                <h2 class="section-title">🎒 SECTION SACS (GRILLE 1 À 30)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">N°</th>
+                            <th style="width: 5%;">Aperçu</th>
+                            <th style="width: 18%;">Nom du modèle</th>
+                            <th style="width: 10%;">Badge</th>
+                            <th style="width: 20%;">Lien Photo (URL)</th>
+                            <th style="width: 10%;">Prix (FCFA)</th>
+                            <th style="width: 28%;">Spécificités Sac</th>
+                            <th style="width: 5%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-sac"></tbody>
+                </table>
+            </div>
+            <button class="btn-save-section" onclick="saveSection('sac')">💾 Enregistrer la section Sacs</button>
+        </div>
+
+        <!-- 5. SECTION MONTRES (1 à 30) -->
+        <div class="section-block">
+            <div class="section-header">
+                <h2 class="section-title">⌚ SECTION MONTRES (GRILLE 1 À 30)</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 4%;">N°</th>
+                            <th style="width: 5%;">Aperçu</th>
+                            <th style="width: 18%;">Nom du modèle</th>
+                            <th style="width: 10%;">Badge</th>
+                            <th style="width: 20%;">Lien Photo (URL)</th>
+                            <th style="width: 10%;">Prix (FCFA)</th>
+                            <th style="width: 28%;">Spécificités Montre</th>
+                            <th style="width: 5%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-montre"></tbody>
+                </table>
+            </div>
+            <button class="btn-save-section" onclick="saveSection('montre')">💾 Enregistrer la section Montres</button>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -77,7 +196,7 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        window.productsData = [];
+        window.productsData = {};
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.uid === 'LiPMCiiqIUNGVutGlCVbCkLieUO2') {
@@ -94,63 +213,176 @@
             const email = document.getElementById('admin-email').value;
             const password = document.getElementById('admin-password').value;
             signInWithEmailAndPassword(auth, email, password).catch(err => alert("Accès refusé : " + err.message));
-        }
+        };
 
-        window.handleLogout = function() { signOut(auth); }
+        window.handleLogout = function() { signOut(auth); };
 
         function loadDatabase() {
             onValue(ref(db, 'products'), (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    window.productsData = Object.values(data).filter(p => p !== null);
-                    renderTable();
+                const data = snapshot.val() || {};
+                window.productsData = data;
+                renderAllTables();
+            });
+        }
+
+        function renderAllTables() {
+            const categories = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
+
+            const existingItemsByCat = {};
+            categories.forEach(cat => { existingItemsByCat[cat] = []; });
+
+            Object.keys(window.productsData).forEach(key => {
+                const prod = window.productsData[key];
+                if (prod) {
+                    const cat = (prod.category || 'habit').toLowerCase().trim();
+                    if (existingItemsByCat[cat]) {
+                        existingItemsByCat[cat].push({ dbKey: key, ...prod });
+                    }
+                }
+            });
+
+            categories.forEach(cat => {
+                const tbody = document.getElementById(`tbody-${cat}`);
+                if (!tbody) return;
+                tbody.innerHTML = "";
+
+                const catList = existingItemsByCat[cat];
+
+                for (let i = 1; i <= 30; i++) {
+                    const fixedKey = `${cat}_${i}`;
+                    const prod = catList.find(p => p.id === i || p.dbKey === fixedKey) || catList[i - 1] || {};
+                    const dbKeyToUse = prod.dbKey || fixedKey;
+
+                    const imageUrl = prod.image || '';
+                    const previewSrc = imageUrl ? imageUrl : 'https://via.placeholder.com/45?text=No+Img';
+
+                    let specsHTML = '';
+                    if (cat === 'habit') {
+                        specsHTML = `
+                            <div class="spec-box">
+                                <label>Matière :</label>
+                                <select id="type-${dbKeyToUse}">
+                                    <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Coton</option>
+                                    <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Nylon</option>
+                                </select>
+                                <label>Supp. Coton (FCFA) :</label>
+                                <input type="number" id="sc-${dbKeyToUse}" value="${prod.suppCoton || 0}">
+                                <label>Supp. Nylon (FCFA) :</label>
+                                <input type="number" id="sn-${dbKeyToUse}" value="${prod.suppNylon || 0}">
+                            </div>`;
+                    } else if (cat === 'chaussure') {
+                        specsHTML = `
+                            <div class="spec-box">
+                                <label>Pointures disponibles :</label>
+                                <input type="text" id="sizes-${dbKeyToUse}" value="${prod.sizes || '38,39,40,41,42,43,44,45'}">
+                                <label>Supp. Semelle Ortho (FCFA) :</label>
+                                <input type="number" id="suppSemelle-${dbKeyToUse}" value="${prod.suppSemelle || 0}">
+                            </div>`;
+                    } else if (cat === 'lunette') {
+                        specsHTML = `
+                            <div class="spec-box">
+                                <label>Matière Monture :</label>
+                                <input type="text" id="frame-${dbKeyToUse}" value="${prod.frameMaterial || 'Acétate'}">
+                                <label>Supp. Verres Polarisés (FCFA) :</label>
+                                <input type="number" id="suppPolarise-${dbKeyToUse}" value="${prod.suppPolarise || 0}">
+                            </div>`;
+                    } else if (cat === 'sac') {
+                        specsHTML = `
+                            <div class="spec-box">
+                                <label>Matière Sac :</label>
+                                <input type="text" id="bagMat-${dbKeyToUse}" value="${prod.bagMaterial || 'Cuir Synthétique'}">
+                                <label>Supp. Finition Cuir Véritable (FCFA) :</label>
+                                <input type="number" id="suppCuir-${dbKeyToUse}" value="${prod.suppCuir || 0}">
+                            </div>`;
+                    } else if (cat === 'montre') {
+                        specsHTML = `
+                            <div class="spec-box">
+                                <label>Type de Bracelet :</label>
+                                <input type="text" id="strap-${dbKeyToUse}" value="${prod.strapType || 'Cuir'}">
+                                <label>Supp. Bracelet Acier Inoxydable (FCFA) :</label>
+                                <input type="number" id="suppAcier-${dbKeyToUse}" value="${prod.suppAcier || 0}">
+                            </div>`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr data-key="${dbKeyToUse}">
+                            <td class="item-index">#${i}</td>
+                            <td><img src="${previewSrc}" id="prev-${dbKeyToUse}" class="img-preview" alt="img" onerror="this.src='https://via.placeholder.com/45?text=Err'"></td>
+                            <td><input type="text" id="name-${dbKeyToUse}" value="${prod.name || ''}" placeholder="Article ${i}"></td>
+                            <td><input type="text" id="badge-${dbKeyToUse}" value="${prod.badge || ''}" placeholder="Ex: Disponible"></td>
+                            <td><input type="text" id="image-${dbKeyToUse}" value="${imageUrl}" placeholder="https://..." oninput="document.getElementById('prev-${dbKeyToUse}').src=this.value"></td>
+                            <td><input type="number" id="price-${dbKeyToUse}" value="${prod.price || 0}"></td>
+                            <td>${specsHTML}</td>
+                            <td><button class="btn-delete" onclick="clearProduct('${dbKeyToUse}')">🧹</button></td>
+                        </tr>
+                    `;
                 }
             });
         }
 
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = "";
-            window.productsData.forEach(prod => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${prod.id}</strong></td>
-                        <td><input type="text" id="name-${prod.id}" value="${prod.name}"></td>
-                        <td><input type="text" id="badge-${prod.id}" value="${prod.badge || ''}" placeholder="Ex: PROMO"></td>
-                        <td><input type="text" id="image-${prod.id}" value="${prod.image}"></td>
-                        <td><input type="number" id="price-${prod.id}" value="${prod.price}"></td>
-                        <td>
-                            <select id="type-${prod.id}">
-                                <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Coton</option>
-                                <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Nylon</option>
-                            </select>
-                        </td>
-                        <td>
-                            Coton: <input type="number" style="width:70px; display:inline;" id="sc-${prod.id}" value="${prod.suppCoton || 0}"><br>
-                            Nylon: <input type="number" style="width:70px; display:inline;" id="sn-${prod.id}" value="${prod.suppNylon || 0}">
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+        window.clearProduct = function(key) {
+            if (confirm("Voulez-vous effacer cet emplacement dans la grille ?")) {
+                remove(ref(db, `products/${key}`))
+                    .then(() => alert("Emplacement vidé !"))
+                    .catch(err => alert("Erreur : " + err.message));
+            }
+        };
 
-        window.saveChanges = function() {
+        window.saveSection = function(category) {
             const updates = {};
-            window.productsData.forEach(prod => {
-                const id = prod.id;
-                updates[`products/prod_${id}/name`] = document.getElementById(`name-${id}`).value;
-                updates[`products/prod_${id}/badge`] = document.getElementById(`badge-${id}`).value;
-                updates[`products/prod_${id}/image`] = document.getElementById(`image-${id}`).value;
-                updates[`products/prod_${id}/price`] = parseInt(document.getElementById(`price-${id}`).value) || 0;
-                updates[`products/prod_${id}/qualityType`] = document.getElementById(`type-${id}`).value;
-                updates[`products/prod_${id}/suppCoton`] = parseInt(document.getElementById(`sc-${id}`).value) || 0;
-                updates[`products/prod_${id}/suppNylon`] = parseInt(document.getElementById(`sn-${id}`).value) || 0;
+            const tbody = document.getElementById(`tbody-${category}`);
+            const rows = tbody.querySelectorAll('tr');
+
+            rows.forEach((row, index) => {
+                const i = index + 1;
+                const key = row.getAttribute('data-key') || `${category}_${i}`;
+
+                const elName = document.getElementById(`name-${key}`);
+                const elBadge = document.getElementById(`badge-${key}`);
+                const elImage = document.getElementById(`image-${key}`);
+                const elPrice = document.getElementById(`price-${key}`);
+
+                updates[`products/${key}/id`] = i;
+                updates[`products/${key}/category`] = category;
+                if (elName) updates[`products/${key}/name`] = elName.value;
+                if (elBadge) updates[`products/${key}/badge`] = elBadge.value;
+                if (elImage) updates[`products/${key}/image`] = elImage.value;
+                if (elPrice) updates[`products/${key}/price`] = parseInt(elPrice.value) || 0;
+
+                if (category === 'habit') {
+                    const elType = document.getElementById(`type-${key}`);
+                    const elSC = document.getElementById(`sc-${key}`);
+                    const elSN = document.getElementById(`sn-${key}`);
+                    if (elType) updates[`products/${key}/qualityType`] = elType.value;
+                    if (elSC) updates[`products/${key}/suppCoton`] = parseInt(elSC.value) || 0;
+                    if (elSN) updates[`products/${key}/suppNylon`] = parseInt(elSN.value) || 0;
+                } else if (category === 'chaussure') {
+                    const elSizes = document.getElementById(`sizes-${key}`);
+                    const elSemelle = document.getElementById(`suppSemelle-${key}`);
+                    if (elSizes) updates[`products/${key}/sizes`] = elSizes.value;
+                    if (elSemelle) updates[`products/${key}/suppSemelle`] = parseInt(elSemelle.value) || 0;
+                } else if (category === 'lunette') {
+                    const elFrame = document.getElementById(`frame-${key}`);
+                    const elPolarise = document.getElementById(`suppPolarise-${key}`);
+                    if (elFrame) updates[`products/${key}/frameMaterial`] = elFrame.value;
+                    if (elPolarise) updates[`products/${key}/suppPolarise`] = parseInt(elPolarise.value) || 0;
+                } else if (category === 'sac') {
+                    const elBagMat = document.getElementById(`bagMat-${key}`);
+                    const elCuir = document.getElementById(`suppCuir-${key}`);
+                    if (elBagMat) updates[`products/${key}/bagMaterial`] = elBagMat.value;
+                    if (elCuir) updates[`products/${key}/suppCuir`] = parseInt(elCuir.value) || 0;
+                } else if (category === 'montre') {
+                    const elStrap = document.getElementById(`strap-${key}`);
+                    const elAcier = document.getElementById(`suppAcier-${key}`);
+                    if (elStrap) updates[`products/${key}/strapType`] = elStrap.value;
+                    if (elAcier) updates[`products/${key}/suppAcier`] = parseInt(elAcier.value) || 0;
+                }
             });
 
             update(ref(db), updates)
-                .then(() => alert("Modifications et badges enregistrés avec succès !"))
-                .catch(err => alert("Erreur de sauvegarde : " + err.message));
-        }
+                .then(() => alert(`Section ${category.toUpperCase()} enregistrée avec succès !`))
+                .catch(err => alert("Erreur lors de la sauvegarde : " + err.message));
+        };
     </script>
 </body>
 </html>
