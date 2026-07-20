@@ -91,7 +91,7 @@
             </form>
         </div>
 
-        <!-- LISTE ET GESTION DES ANCIENS/NOUVEAUX ARTICLES -->
+        <!-- LISTE ET GESTION DES ARTICLES -->
         <div class="products-card">
             <h2>📦 Produits dans Firebase</h2>
             <p style="font-size: 0.85em; color: #aaa; margin-bottom: 15px;">
@@ -157,14 +157,14 @@
                 .catch(err => alert("Erreur: " + err.message));
         });
 
-        // 2. LECTURE DES DONNÉES DE FIREBASE
+        // 2. LECTURE DES DONNÉES EN TEMPS RÉEL
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
             window.allProducts = snapshot.val() || {};
             renderAdminProducts();
         });
 
-        // 3. FILTRAGE
+        // 3. SELECTION DU FILTRE
         window.filterAdminList = function(category, btnElement) {
             window.currentFilter = category;
             document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
@@ -172,7 +172,7 @@
             renderAdminProducts();
         }
 
-        // 4. AFFICHAGE DES ARTICLES
+        // 4. AFFICHAGE ET DECTECTION AVANCÉE DES ARTICLES
         function renderAdminProducts() {
             const listContainer = document.getElementById('admin-products-list');
             listContainer.innerHTML = "";
@@ -186,33 +186,44 @@
             let filteredEntries = entries.filter(([key, prod]) => {
                 if (!prod) return false;
                 if (window.currentFilter === 'all') return true;
-                const cat = (prod.category || '').toLowerCase();
-                return cat === window.currentFilter;
+
+                // Récupération souple de la catégorie (ignore casse et nom de propriété)
+                const rawCat = prod.category || prod.section || prod.type || '';
+                const catClean = rawCat.toString().trim().toLowerCase();
+
+                return catClean === window.currentFilter;
             });
 
             if (filteredEntries.length === 0) {
-                listContainer.innerHTML = `<p style='color:#e74c3c;'>Aucun produit dans la section "${window.currentFilter.toUpperCase()}". Cliquez sur "Tous les articles" pour les réaffecter.</p>`;
+                listContainer.innerHTML = `
+                    <div style="background:#222; padding:15px; border-radius:8px; border:1px solid #444; margin-top:10px;">
+                        <p style='color:#ff4757; font-weight:bold;'>⚠️ Aucun produit trouvé sous la catégorie "${window.currentFilter.toUpperCase()}".</p>
+                        <p style='color:#ccc; font-size:0.9em; margin-top:5px;'>
+                            👉 Cliquez sur le premier bouton <strong>"🌐 Tous les articles"</strong> ci-dessus pour afficher vos anciens articles et leur assigner une section.
+                        </p>
+                    </div>`;
                 return;
             }
 
             filteredEntries.forEach(([key, prod]) => {
-                const currentCat = prod.category || 'non-classe';
-                
+                const rawCat = prod.category || prod.section || prod.type || 'non-classe';
+                const catClean = rawCat.toString().trim().toLowerCase();
+
                 listContainer.innerHTML += `
                     <div class="product-item">
-                        <img src="${prod.image || 'https://via.placeholder.com/60'}" alt="${prod.name}">
+                        <img src="${prod.image || 'https://via.placeholder.com/60'}" alt="${prod.name || 'Produit'}">
                         <div class="product-info-admin">
                             <strong>${prod.name || 'Article sans nom'}</strong> 
-                            <span class="badge-cat">${currentCat}</span><br>
+                            <span class="badge-cat">${rawCat}</span><br>
                             <small style="color:#aaa;">Prix: ${prod.price ? prod.price.toLocaleString() : 0} FCFA</small><br>
                             
-                            <!-- DÉROULANT DE RECLASSEMENT -->
+                            <!-- RECLASSEMENT DIRECT VERS FIREBASE -->
                             <select class="reclass-select" onchange="reclassifyProduct('${key}', this.value)">
-                                <option value="">Reclasser la section...</option>
-                                <option value="habit" ${currentCat === 'habit' ? 'selected' : ''}>👕 Section Habits</option>
-                                <option value="chaussure" ${currentCat === 'chaussure' ? 'selected' : ''}>👟 Section Chaussures</option>
-                                <option value="lunette" ${currentCat === 'lunette' ? 'selected' : ''}>🕶️ Section Lunettes</option>
-                                <option value="sac" ${currentCat === 'sac' ? 'selected' : ''}>🎒 Section Sacs</option>
+                                <option value="">Reclasser vers...</option>
+                                <option value="habit" ${catClean === 'habit' ? 'selected' : ''}>👕 Section Habits</option>
+                                <option value="chaussure" ${catClean === 'chaussure' ? 'selected' : ''}>👟 Section Chaussures</option>
+                                <option value="lunette" ${catClean === 'lunette' ? 'selected' : ''}>🕶️ Section Lunettes</option>
+                                <option value="sac" ${catClean === 'sac' ? 'selected' : ''}>🎒 Section Sacs</option>
                             </select>
                         </div>
                         <button class="btn-delete" onclick="deleteProduct('${key}')">Supprimer</button>
@@ -221,12 +232,12 @@
             });
         }
 
-        // 5. FONCTION POUR CHANGER LA SECTION D'UN ARTICLE EN TEMPS RÉEL
+        // 5. FONCTION DE MISE À JOUR DE SECTION DANS FIREBASE
         window.reclassifyProduct = function(key, newCategory) {
             if (!newCategory) return;
             const itemRef = ref(db, `products/${key}`);
             update(itemRef, { category: newCategory })
-                .then(() => alert("✅ Article reclassé avec succès dans la section : " + newCategory.toUpperCase()))
+                .then(() => alert("✅ Article reclassé avec succès dans : " + newCategory.toUpperCase()))
                 .catch(err => alert("Erreur lors de la mise à jour : " + err.message));
         }
 
