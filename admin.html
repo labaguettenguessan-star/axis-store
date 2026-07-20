@@ -30,7 +30,7 @@
         .product-info-admin { flex-grow: 1; }
         .badge-cat { background: #333; color: #39ff14; font-size: 0.75em; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 8px; }
         
-        .reclass-select { padding: 6px; background: #222; color: #39ff14; border: 1px solid #39ff14; border-radius: 4px; font-size: 0.8em; margin-top: 5px; cursor: pointer; }
+        .reclass-select { padding: 6px; background: #222; color: #39ff14; border: 1px solid #39ff14; border-radius: 4px; font-size: 0.85em; margin-top: 5px; cursor: pointer; }
         .btn-delete { background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
         .btn-delete:hover { background: #c0392b; }
     </style>
@@ -95,7 +95,7 @@
         <div class="products-card">
             <h2>📦 Produits dans Firebase</h2>
             <p style="font-size: 0.85em; color: #aaa; margin-bottom: 15px;">
-                Filtrez pour voir vos articles. Cliquez sur <strong>"Tous les articles"</strong> pour afficher vos anciens produits et les reclasser.
+                Filtrez pour voir vos articles. Cliquez sur <strong>"Tous les articles"</strong> pour reclasser vos produits.
             </p>
             
             <div class="filter-bar">
@@ -130,7 +130,7 @@
         window.allProducts = {};
         window.currentFilter = 'all';
 
-        // 1. AJOUT D'UN NOUVEAU PRODUIT
+        // 1. AJOUT DE PRODUIT
         document.getElementById('add-product-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -157,22 +157,22 @@
                 .catch(err => alert("Erreur: " + err.message));
         });
 
-        // 2. LECTURE DES DONNÉES EN TEMPS RÉEL
+        // 2. LECTURE FIREBASE
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
             window.allProducts = snapshot.val() || {};
             renderAdminProducts();
         });
 
-        // 3. SELECTION DU FILTRE
+        // 3. FILTRE DE LA LISTE ADMIN
         window.filterAdminList = function(category, btnElement) {
             window.currentFilter = category;
             document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
             renderAdminProducts();
-        }
+        };
 
-        // 4. AFFICHAGE ET DECTECTION AVANCÉE DES ARTICLES
+        // 4. AFFICHAGE DES ARTICLES
         function renderAdminProducts() {
             const listContainer = document.getElementById('admin-products-list');
             listContainer.innerHTML = "";
@@ -187,11 +187,8 @@
                 if (!prod) return false;
                 if (window.currentFilter === 'all') return true;
 
-                // Récupération souple de la catégorie (ignore casse et nom de propriété)
                 const rawCat = prod.category || prod.section || prod.type || '';
-                const catClean = rawCat.toString().trim().toLowerCase();
-
-                return catClean === window.currentFilter;
+                return rawCat.toString().trim().toLowerCase() === window.currentFilter;
             });
 
             if (filteredEntries.length === 0) {
@@ -199,7 +196,7 @@
                     <div style="background:#222; padding:15px; border-radius:8px; border:1px solid #444; margin-top:10px;">
                         <p style='color:#ff4757; font-weight:bold;'>⚠️ Aucun produit trouvé sous la catégorie "${window.currentFilter.toUpperCase()}".</p>
                         <p style='color:#ccc; font-size:0.9em; margin-top:5px;'>
-                            👉 Cliquez sur le premier bouton <strong>"🌐 Tous les articles"</strong> ci-dessus pour afficher vos anciens articles et leur assigner une section.
+                            👉 Cliquez sur <strong>"🌐 Tous les articles"</strong> ci-dessus pour afficher vos produits et leur assigner la bonne section.
                         </p>
                     </div>`;
                 return;
@@ -217,8 +214,7 @@
                             <span class="badge-cat">${rawCat}</span><br>
                             <small style="color:#aaa;">Prix: ${prod.price ? prod.price.toLocaleString() : 0} FCFA</small><br>
                             
-                            <!-- RECLASSEMENT DIRECT VERS FIREBASE -->
-                            <select class="reclass-select" onchange="reclassifyProduct('${key}', this.value)">
+                            <select class="reclass-select" onchange="window.reclassifyProduct('${key}', this.value)">
                                 <option value="">Reclasser vers...</option>
                                 <option value="habit" ${catClean === 'habit' ? 'selected' : ''}>👕 Section Habits</option>
                                 <option value="chaussure" ${catClean === 'chaussure' ? 'selected' : ''}>👟 Section Chaussures</option>
@@ -226,27 +222,38 @@
                                 <option value="sac" ${catClean === 'sac' ? 'selected' : ''}>🎒 Section Sacs</option>
                             </select>
                         </div>
-                        <button class="btn-delete" onclick="deleteProduct('${key}')">Supprimer</button>
+                        <button class="btn-delete" onclick="window.deleteProduct('${key}')">Supprimer</button>
                     </div>
                 `;
             });
         }
 
-        // 5. FONCTION DE MISE À JOUR DE SECTION DANS FIREBASE
+        // 5. FONCTION RECLASSEMENT DANS FIREBASE (NETTOIE LES ANCIENS CHAMPS)
         window.reclassifyProduct = function(key, newCategory) {
             if (!newCategory) return;
+            
             const itemRef = ref(db, `products/${key}`);
-            update(itemRef, { category: newCategory })
-                .then(() => alert("✅ Article reclassé avec succès dans : " + newCategory.toUpperCase()))
-                .catch(err => alert("Erreur lors de la mise à jour : " + err.message));
-        }
+            
+            // Mise à jour du champ principal category et suppression des anciens champs incompatibles (section, type)
+            update(itemRef, { 
+                category: newCategory,
+                section: null,
+                type: null
+            })
+            .then(() => {
+                alert("✅ Article reclassé dans la section : " + newCategory.toUpperCase());
+            })
+            .catch(err => {
+                alert("❌ Erreur lors du reclassement : " + err.message);
+            });
+        };
 
-        // 6. SUPPRESSION
+        // 6. SUPPRESSION D'ARTICLE
         window.deleteProduct = function(key) {
-            if (confirm("Supprimer cet article définitivement ?")) {
+            if (confirm("Voulez-vous vraiment supprimer cet article de la base de données ?")) {
                 remove(ref(db, `products/${key}`));
             }
-        }
+        };
     </script>
 </body>
 </html>
