@@ -3,116 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - AXIS STORE</title>
+    <title>Dashboard Privé - AXIS STORE</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #101010; color: #fff; padding: 20px; }
-        h1 { text-align: center; color: #39ff14; margin-bottom: 20px; }
-        
-        .admin-container { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
-        
-        .form-card, .products-card { background: #1a1a1a; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        .form-card h2, .products-card h2 { color: #39ff14; margin-bottom: 15px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.85em; color: #aaa; }
-        .form-group input, .form-group select { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: #fff; font-size: 0.9em; }
-        
-        .btn-submit { margin-top: 15px; background: #39ff14; color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-submit:hover { background: #32d811; }
-
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .btn-filter { background: #222; color: #fff; border: 1px solid #444; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 0.85em; }
-        .btn-filter.active { background: #39ff14; color: #000; border-color: #39ff14; font-weight: bold; }
-
-        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #222; gap: 15px; flex-wrap: wrap; }
-        .product-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; background: #333; }
-        .product-info-admin { flex-grow: 1; }
-        .badge-cat { background: #333; color: #39ff14; font-size: 0.75em; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 8px; }
-        
-        .reclass-select { padding: 6px; background: #222; color: #39ff14; border: 1px solid #39ff14; border-radius: 4px; font-size: 0.85em; margin-top: 5px; cursor: pointer; }
-        .btn-delete { background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-        .btn-delete:hover { background: #c0392b; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #101010; color: #fff; padding: 40px; max-width: 1300px; margin: 0 auto; }
+        h1 { color: #39ff14; text-align: center; margin-bottom: 30px; }
+        .login-box { max-width: 400px; margin: 50px auto; background: #1a1a1a; padding: 30px; border-radius: 8px; border: 1px solid #333; text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #2b2b2b; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #39ff14; color: black; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #2bdc0f; }
+        .hidden { display: none; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #333; text-align: left; }
+        .admin-table th { background: #222; color: #39ff14; }
+        .logout-btn { background: #e74c3c; color: white; margin-top: 10px; width: auto; padding: 5px 15px; }
     </style>
 </head>
 <body>
 
-    <h1>DASHBOARD ADMIN - AXIS STORE</h1>
+    <h1>🔒 DASHBOARD DE GESTION AXIS STORE</h1>
 
-    <div class="admin-container">
-        <!-- FORMULAIRE D'AJOUT -->
-        <div class="form-card">
-            <h2>➕ Ajouter un Produit</h2>
-            <form id="add-product-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nom du Produit</label>
-                        <input type="text" id="p-name" placeholder="Ex: T-Shirt Auras Rick" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Section / Catégorie</label>
-                        <select id="p-category" required>
-                            <option value="habit">👕 Habits / Vêtements</option>
-                            <option value="chaussure">👟 Chaussures</option>
-                            <option value="lunette">🕶️ Lunettes</option>
-                            <option value="sac">🎒 Sacs</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Prix de base (FCFA)</label>
-                        <input type="number" id="p-price" placeholder="Ex: 10000" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Badge</label>
-                        <select id="p-badge">
-                            <option value="NOUVEAU">NOUVEAU</option>
-                            <option value="POPULAIRE">POPULAIRE</option>
-                            <option value="BEST-SELLER">BEST-SELLER</option>
-                            <option value="EXCLUSIF">EXCLUSIF</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label>Lien de l'Image (URL)</label>
-                        <input type="url" id="p-image" placeholder="https://..." required>
-                    </div>
-                    <div class="form-group">
-                        <label>Matière principale</label>
-                        <select id="p-qualityType">
-                            <option value="coton">Coton</option>
-                            <option value="nylon">Nylon / Synthétique</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Supplément Optionnel (FCFA)</label>
-                        <input type="number" id="p-suppNylon" value="2000">
-                    </div>
-                </div>
-                <button type="submit" class="btn-submit">ENREGISTRER LE PRODUIT</button>
-            </form>
+    <!-- FORMULAIRE DE CONNEXION FIREBASE -->
+    <div id="auth-container" class="login-box">
+        <h2>Connexion Securisée</h2>
+        <input type="email" id="admin-email" placeholder="Email Admin" value="labaguettenguessan@gmail.com">
+        <input type="password" id="admin-password" placeholder="Mot de passe secret">
+        <button onclick="handleLogin()">Se connecter</button>
+    </div>
+
+    <!-- TABLEAU DE MODIFICATION -->
+    <div id="dashboard-container" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <p>Statut : 🟢 Connecté en tant que gérant.</p>
+            <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
         </div>
 
-        <!-- LISTE ET GESTION DES ARTICLES -->
-        <div class="products-card">
-            <h2>📦 Produits dans Firebase</h2>
-            <p style="font-size: 0.85em; color: #aaa; margin-bottom: 15px;">
-                Filtrez pour voir vos articles. Cliquez sur <strong>"Tous les articles"</strong> pour reclasser vos produits.
-            </p>
-            
-            <div class="filter-bar">
-                <button class="btn-filter active" onclick="filterAdminList('all', this)">🌐 Tous les articles</button>
-                <button class="btn-filter" onclick="filterAdminList('habit', this)">👕 Habits</button>
-                <button class="btn-filter" onclick="filterAdminList('chaussure', this)">👟 Chaussures</button>
-                <button class="btn-filter" onclick="filterAdminList('lunette', this)">🕶️ Lunettes</button>
-                <button class="btn-filter" onclick="filterAdminList('sac', this)">🎒 Sacs</button>
-            </div>
-
-            <div id="admin-products-list">Chargement des données...</div>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">ID</th>
+                        <th style="width: 20%;">Nom du modèle</th>
+                        <th style="width: 10%;">Badge (Texte)</th>
+                        <th style="width: 25%;">Lien Photo (URL)</th>
+                        <th style="width: 15%;">Prix de Base (FCFA)</th>
+                        <th style="width: 10%;">Matériau</th>
+                        <th style="width: 15%;">Suppléments (Coton/Nylon)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Rempli dynamiquement -->
+                </tbody>
+            </table>
         </div>
+        <button style="margin-top: 25px;" onclick="saveChanges()">SAUVEGARDER TOUTES LES MODIFICATIONS</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD8mFRkNYjYTF_g4AWttKrHccY9H-AWN54",
@@ -126,134 +75,82 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
-        window.allProducts = {};
-        window.currentFilter = 'all';
+        window.productsData = [];
 
-        // 1. AJOUT DE PRODUIT
-        document.getElementById('add-product-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const productsRef = ref(db, 'products');
-            const newProductRef = push(productsRef);
-
-            const productData = {
-                id: newProductRef.key,
-                name: document.getElementById('p-name').value.trim(),
-                category: document.getElementById('p-category').value,
-                price: parseInt(document.getElementById('p-price').value),
-                badge: document.getElementById('p-badge').value,
-                image: document.getElementById('p-image').value.trim(),
-                qualityType: document.getElementById('p-qualityType').value,
-                suppCoton: 0,
-                suppNylon: parseInt(document.getElementById('p-suppNylon').value) || 0
-            };
-
-            set(newProductRef, productData)
-                .then(() => {
-                    alert("✅ Article enregistré !");
-                    document.getElementById('add-product-form').reset();
-                })
-                .catch(err => alert("Erreur: " + err.message));
-        });
-
-        // 2. LECTURE FIREBASE
-        const productsRef = ref(db, 'products');
-        onValue(productsRef, (snapshot) => {
-            window.allProducts = snapshot.val() || {};
-            renderAdminProducts();
-        });
-
-        // 3. FILTRE DE LA LISTE ADMIN
-        window.filterAdminList = function(category, btnElement) {
-            window.currentFilter = category;
-            document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-            if (btnElement) btnElement.classList.add('active');
-            renderAdminProducts();
-        };
-
-        // 4. AFFICHAGE DES ARTICLES
-        function renderAdminProducts() {
-            const listContainer = document.getElementById('admin-products-list');
-            listContainer.innerHTML = "";
-
-            const entries = Object.entries(window.allProducts);
-            if (entries.length === 0) {
-                listContainer.innerHTML = "<p style='color:#888;'>Aucun produit trouvé dans Firebase.</p>";
-                return;
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === 'LiPMCiiqIUNGVutGlCVbCkLieUO2') {
+                document.getElementById('auth-container').classList.add('hidden');
+                document.getElementById('dashboard-container').classList.remove('hidden');
+                loadDatabase();
+            } else {
+                document.getElementById('auth-container').classList.remove('hidden');
+                document.getElementById('dashboard-container').classList.add('hidden');
             }
+        });
 
-            let filteredEntries = entries.filter(([key, prod]) => {
-                if (!prod) return false;
-                if (window.currentFilter === 'all') return true;
+        window.handleLogin = function() {
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            signInWithEmailAndPassword(auth, email, password).catch(err => alert("Accès refusé : " + err.message));
+        }
 
-                const rawCat = prod.category || prod.section || prod.type || '';
-                return rawCat.toString().trim().toLowerCase() === window.currentFilter;
+        window.handleLogout = function() { signOut(auth); }
+
+        function loadDatabase() {
+            onValue(ref(db, 'products'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    window.productsData = Object.values(data).filter(p => p !== null);
+                    renderTable();
+                }
             });
+        }
 
-            if (filteredEntries.length === 0) {
-                listContainer.innerHTML = `
-                    <div style="background:#222; padding:15px; border-radius:8px; border:1px solid #444; margin-top:10px;">
-                        <p style='color:#ff4757; font-weight:bold;'>⚠️ Aucun produit trouvé sous la catégorie "${window.currentFilter.toUpperCase()}".</p>
-                        <p style='color:#ccc; font-size:0.9em; margin-top:5px;'>
-                            👉 Cliquez sur <strong>"🌐 Tous les articles"</strong> ci-dessus pour afficher vos produits et leur assigner la bonne section.
-                        </p>
-                    </div>`;
-                return;
-            }
-
-            filteredEntries.forEach(([key, prod]) => {
-                const rawCat = prod.category || prod.section || prod.type || 'non-classe';
-                const catClean = rawCat.toString().trim().toLowerCase();
-
-                listContainer.innerHTML += `
-                    <div class="product-item">
-                        <img src="${prod.image || 'https://via.placeholder.com/60'}" alt="${prod.name || 'Produit'}">
-                        <div class="product-info-admin">
-                            <strong>${prod.name || 'Article sans nom'}</strong> 
-                            <span class="badge-cat">${rawCat}</span><br>
-                            <small style="color:#aaa;">Prix: ${prod.price ? prod.price.toLocaleString() : 0} FCFA</small><br>
-                            
-                            <select class="reclass-select" onchange="window.reclassifyProduct('${key}', this.value)">
-                                <option value="">Reclasser vers...</option>
-                                <option value="habit" ${catClean === 'habit' ? 'selected' : ''}>👕 Section Habits</option>
-                                <option value="chaussure" ${catClean === 'chaussure' ? 'selected' : ''}>👟 Section Chaussures</option>
-                                <option value="lunette" ${catClean === 'lunette' ? 'selected' : ''}>🕶️ Section Lunettes</option>
-                                <option value="sac" ${catClean === 'sac' ? 'selected' : ''}>🎒 Section Sacs</option>
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = "";
+            window.productsData.forEach(prod => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${prod.id}</strong></td>
+                        <td><input type="text" id="name-${prod.id}" value="${prod.name}"></td>
+                        <td><input type="text" id="badge-${prod.id}" value="${prod.badge || ''}" placeholder="Ex: PROMO"></td>
+                        <td><input type="text" id="image-${prod.id}" value="${prod.image}"></td>
+                        <td><input type="number" id="price-${prod.id}" value="${prod.price}"></td>
+                        <td>
+                            <select id="type-${prod.id}">
+                                <option value="coton" ${prod.qualityType === 'coton' ? 'selected' : ''}>Coton</option>
+                                <option value="nylon" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Nylon</option>
                             </select>
-                        </div>
-                        <button class="btn-delete" onclick="window.deleteProduct('${key}')">Supprimer</button>
-                    </div>
+                        </td>
+                        <td>
+                            Coton: <input type="number" style="width:70px; display:inline;" id="sc-${prod.id}" value="${prod.suppCoton || 0}"><br>
+                            Nylon: <input type="number" style="width:70px; display:inline;" id="sn-${prod.id}" value="${prod.suppNylon || 0}">
+                        </td>
+                    </tr>
                 `;
             });
         }
 
-        // 5. FONCTION RECLASSEMENT DANS FIREBASE (NETTOIE LES ANCIENS CHAMPS)
-        window.reclassifyProduct = function(key, newCategory) {
-            if (!newCategory) return;
-            
-            const itemRef = ref(db, `products/${key}`);
-            
-            // Mise à jour du champ principal category et suppression des anciens champs incompatibles (section, type)
-            update(itemRef, { 
-                category: newCategory,
-                section: null,
-                type: null
-            })
-            .then(() => {
-                alert("✅ Article reclassé dans la section : " + newCategory.toUpperCase());
-            })
-            .catch(err => {
-                alert("❌ Erreur lors du reclassement : " + err.message);
+        window.saveChanges = function() {
+            const updates = {};
+            window.productsData.forEach(prod => {
+                const id = prod.id;
+                updates[`products/prod_${id}/name`] = document.getElementById(`name-${id}`).value;
+                updates[`products/prod_${id}/badge`] = document.getElementById(`badge-${id}`).value;
+                updates[`products/prod_${id}/image`] = document.getElementById(`image-${id}`).value;
+                updates[`products/prod_${id}/price`] = parseInt(document.getElementById(`price-${id}`).value) || 0;
+                updates[`products/prod_${id}/qualityType`] = document.getElementById(`type-${id}`).value;
+                updates[`products/prod_${id}/suppCoton`] = parseInt(document.getElementById(`sc-${id}`).value) || 0;
+                updates[`products/prod_${id}/suppNylon`] = parseInt(document.getElementById(`sn-${id}`).value) || 0;
             });
-        };
 
-        // 6. SUPPRESSION D'ARTICLE
-        window.deleteProduct = function(key) {
-            if (confirm("Voulez-vous vraiment supprimer cet article de la base de données ?")) {
-                remove(ref(db, `products/${key}`));
-            }
-        };
+            update(ref(db), updates)
+                .then(() => alert("Modifications et badges enregistrés avec succès !"))
+                .catch(err => alert("Erreur de sauvegarde : " + err.message));
+        }
     </script>
 </body>
 </html>
