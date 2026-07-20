@@ -252,16 +252,25 @@
         window.productsData = [];
         window.currentCategory = 'all';
 
-        // Générateur d'articles fictifs pour atteindre exactement 30 articles par section
-        function generateCategoryItems(catKey, prefixName, basePrice, imgKeyword) {
+        // Articles réels originaux préservés
+        const baseHabits = [
+            { id: 'auras_rick_white', name: 'T-Shirt Auras Rick (Blanc)', category: 'habit', price: 10000, badge: 'BEST-SELLER', image: 'https://picsum.photos/seed/auras_white/400/400', qualityType: 'coton', suppCoton: 0, suppNylon: 2000 },
+            { id: 'auras_rick_black', name: 'T-Shirt Auras Rick (Noir)', category: 'habit', price: 10000, badge: 'BEST-SELLER', image: 'https://picsum.photos/seed/auras_black/400/400', qualityType: 'coton', suppCoton: 0, suppNylon: 2000 },
+            { id: 'auras_one_white', name: 'T-Shirt Auras One (Blanc)', category: 'habit', price: 10000, badge: 'EXCLUSIF', image: 'https://picsum.photos/seed/auras_one/400/400', qualityType: 'coton', suppCoton: 0, suppNylon: 2000 },
+            { id: 'ensemble_coton', name: 'Ensemble Coton Premium', category: 'habit', price: 15000, badge: 'NOUVEAU', image: 'https://picsum.photos/seed/ensemble_coton/400/400', qualityType: 'coton', suppCoton: 0, suppNylon: 2500 },
+            { id: 'jogger_nylon', name: 'Jogger Nylon Streetwear', category: 'habit', price: 12000, badge: 'TENDANCE', image: 'https://picsum.photos/seed/jogger_nylon/400/400', qualityType: 'nylon', suppCoton: 0, suppNylon: 2000 }
+        ];
+
+        // Générateur dynamique pour compléter chaque section jusqu'à 30 articles
+        function generateCategoryItems(catKey, prefixName, basePrice, startFrom = 1) {
             let items = [];
-            for (let i = 1; i <= 30; i++) {
+            for (let i = startFrom; i <= 30; i++) {
                 items.push({
                     id: `${catKey}_gen_${i}`,
                     name: `${prefixName} #${i}`,
                     category: catKey,
                     price: basePrice + (i * 500),
-                    badge: i <= 5 ? 'POPULAIRE' : 'NOUVEAU',
+                    badge: i % 3 === 0 ? 'POPULAIRE' : 'NOUVEAU',
                     image: `https://picsum.photos/seed/${catKey}_${i}/400/400`,
                     qualityType: i % 2 === 0 ? "nylon" : "coton",
                     suppCoton: 0,
@@ -271,10 +280,10 @@
             return items;
         }
 
-        const defaultHabits = generateCategoryItems('habit', 'Habit Streetwear', 10000, 'clothing');
-        const defaultChaussures = generateCategoryItems('chaussure', 'Basket AXIS Edition', 18000, 'shoes');
-        const defaultLunettes = generateCategoryItems('lunette', 'Lunette AXIS Vision', 8000, 'glasses');
-        const defaultSacs = generateCategoryItems('sac', 'Sac AXIS Luxe', 12000, 'bag');
+        const defaultHabits = [...baseHabits, ...generateCategoryItems('habit', 'Habit Streetwear AXIS', 10000, baseHabits.length + 1)];
+        const defaultChaussures = generateCategoryItems('chaussure', 'Basket AXIS Edition', 18000);
+        const defaultLunettes = generateCategoryItems('lunette', 'Lunette AXIS Vision', 8000);
+        const defaultSacs = generateCategoryItems('sac', 'Sac AXIS Luxe', 12000);
 
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
@@ -307,7 +316,6 @@
                 return false;
             });
 
-            // Complète avec la liste générée pour faire exactement 30 articles
             if (realItems.length < 30) {
                 const missingCount = 30 - realItems.length;
                 return realItems.concat(defaultList.slice(0, missingCount));
