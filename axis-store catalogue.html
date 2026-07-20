@@ -18,7 +18,7 @@
             padding-top: 90px;
         }
         h1 { text-align: center; color: #39ff14; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
         
         .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: right; margin-bottom: 2px; order: 2; }
         .logo span { color: #39ff14; }
@@ -43,6 +43,30 @@
         nav ul { display: flex; list-style: none; gap: 30px; }
         nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
         nav a:hover { color: #39ff14; }
+
+        /* BOUTONS DE FILTRES/SECTIONS */
+        .category-filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: #1a1a1a;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #39ff14;
+            color: #000;
+            border-color: #39ff14;
+        }
 
         @media (max-width: 768px) {
             header { padding: 12px; }
@@ -159,6 +183,15 @@
     <h1>NOTRE CATALOGUE</h1>
     <p class="subtitle">Revendeur officiel.</p>
 
+    <!-- BARRE DE SECTIONS / FILTRES -->
+    <div class="category-filters">
+        <button class="filter-btn active" onclick="filterCategory('all', this)">🔥 Tous les articles</button>
+        <button class="filter-btn" onclick="filterCategory('habit', this)">👕 Habits</button>
+        <button class="filter-btn" onclick="filterCategory('chaussure', this)">👟 Chaussures</button>
+        <button class="filter-btn" onclick="filterCategory('lunette', this)">🕶️ Lunettes</button>
+        <button class="filter-btn" onclick="filterCategory('sac', this)">🎒 Sacs</button>
+    </div>
+
     <div class="main-container">
         <div class="catalog-container">
             <div class="catalog-grid" id="catalog-products">
@@ -194,7 +227,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 AXIS STORE. QUALITE ASSURÉE. BY PANDOR AGENCY </p>
+        <p>&copy; 2026 AXIS STORE. QUALITÉ ASSURÉE. BY PANDOR AGENCY </p>
     </footer>
 
     <script type="module">
@@ -217,6 +250,7 @@
         window.MERCHANT_NUMBER = "2250720648060"; 
         window.cart = [];
         window.productsData = [];
+        window.currentCategory = 'all';
 
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
@@ -227,12 +261,39 @@
             }
         });
 
+        window.filterCategory = function(category, btnElement) {
+            window.currentCategory = category;
+            
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+
+            renderCatalog();
+        }
+
         window.renderCatalog = function() {
             const catalogContainer = document.getElementById('catalog-products');
             if (!catalogContainer) return;
             catalogContainer.innerHTML = "";
 
-            window.productsData.forEach(prod => {
+            const filteredProducts = window.productsData.filter(prod => {
+                if (window.currentCategory === 'all') return true;
+                const category = (prod.category || '').toLowerCase();
+                const name = (prod.name || '').toLowerCase();
+                
+                if (window.currentCategory === 'habit') return category.includes('habit') || category.includes('vetement') || name.includes('t-shirt') || name.includes('pantalon') || category === 'axis';
+                if (window.currentCategory === 'chaussure') return category.includes('chaussure') || category.includes('basket') || name.includes('chaussure') || name.includes('basket') || name.includes('sneaker');
+                if (window.currentCategory === 'lunette') return category.includes('lunette') || name.includes('lunette');
+                if (window.currentCategory === 'sac') return category.includes('sac') || name.includes('sac');
+                return true;
+            });
+
+            if (filteredProducts.length === 0) {
+                catalogContainer.innerHTML = `<p style="color: #888; text-align: center; width: 100%; grid-column: 1/-1;">Aucun article disponible dans cette section pour le moment.</p>`;
+                return;
+            }
+
+            filteredProducts.forEach(prod => {
                 const sc = prod.suppCoton || 0;
                 const sn = prod.suppNylon || 0;
 
@@ -251,7 +312,7 @@
                 catalogContainer.innerHTML += `
                     <div class="product-card">
                         <div class="image-container">
-                            <span class="badge-expert">${prod.badge}</span>
+                            <span class="badge-expert">${prod.badge || 'NOUVEAU'}</span>
                             <img src="${prod.image}" alt="${prod.name}">
                         </div>
                         <div class="product-info">
@@ -262,12 +323,19 @@
                             
                             <div class="options-container">
                                 <div class="option-group">
-                                    <label for="size-${prod.id}">Taille :</label>
+                                    <label for="size-${prod.id}">Pointure / Taille :</label>
                                     <select id="size-${prod.id}" class="option-select">
                                         <option value="S">S</option>
                                         <option value="M" selected>M</option>
                                         <option value="L">L</option>
                                         <option value="XL">XL</option>
+                                        <option value="39">39</option>
+                                        <option value="40">40</option>
+                                        <option value="41">41</option>
+                                        <option value="42">42</option>
+                                        <option value="43">43</option>
+                                        <option value="44">44</option>
+                                        <option value="Taille Unique">Taille Unique</option>
                                     </select>
                                 </div>
                                 <div class="option-group">
@@ -337,7 +405,7 @@
                     <div class="cart-item">
                         <div>
                             <span>${item.name} (x${item.quantity})</span>
-                            <span class="cart-item-meta">Taille: ${item.size} | ${item.quality}</span>
+                            <span class="cart-item-meta">Taille/Pointure: ${item.size} | ${item.quality}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
@@ -361,7 +429,7 @@
             let total = 0;
             window.cart.forEach(item => {
                 const subtotal = item.price * item.quantity; total += subtotal;
-                message += `- ${item.name} (x${item.quantity}) | Taille: ${item.size} | ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
+                message += `- ${item.name} (x${item.quantity}) | Taille/Pointure: ${item.size} | ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
             });
             message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
             window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
