@@ -172,7 +172,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a href="#">Accueil</a></li>
                 <li><a href="#" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -186,10 +186,10 @@
     <!-- BARRE DE SECTIONS / FILTRES -->
     <div class="category-filters">
         <button class="filter-btn active" onclick="filterCategory('all', this)">🔥 Tous les articles</button>
-        <button class="filter-btn" onclick="filterCategory('habit', this)">👕 Habits</button>
-        <button class="filter-btn" onclick="filterCategory('chaussure', this)">👟 Chaussures</button>
-        <button class="filter-btn" onclick="filterCategory('lunette', this)">🕶️ Lunettes</button>
-        <button class="filter-btn" onclick="filterCategory('sac', this)">🎒 Sacs</button>
+        <button class="filter-btn" onclick="filterCategory('habit', this)">👕 Habits (30)</button>
+        <button class="filter-btn" onclick="filterCategory('chaussure', this)">👟 Chaussures (30)</button>
+        <button class="filter-btn" onclick="filterCategory('lunette', this)">🕶️ Lunettes (30)</button>
+        <button class="filter-btn" onclick="filterCategory('sac', this)">🎒 Sacs (30)</button>
     </div>
 
     <div class="main-container">
@@ -252,13 +252,37 @@
         window.productsData = [];
         window.currentCategory = 'all';
 
+        // Générateur d'articles fictifs pour atteindre exactement 30 articles par section
+        function generateCategoryItems(catKey, prefixName, basePrice, imgKeyword) {
+            let items = [];
+            for (let i = 1; i <= 30; i++) {
+                items.push({
+                    id: `${catKey}_gen_${i}`,
+                    name: `${prefixName} #${i}`,
+                    category: catKey,
+                    price: basePrice + (i * 500),
+                    badge: i <= 5 ? 'POPULAIRE' : 'NOUVEAU',
+                    image: `https://picsum.photos/seed/${catKey}_${i}/400/400`,
+                    qualityType: i % 2 === 0 ? "nylon" : "coton",
+                    suppCoton: 0,
+                    suppNylon: 2000
+                });
+            }
+            return items;
+        }
+
+        const defaultHabits = generateCategoryItems('habit', 'Habit Streetwear', 10000, 'clothing');
+        const defaultChaussures = generateCategoryItems('chaussure', 'Basket AXIS Edition', 18000, 'shoes');
+        const defaultLunettes = generateCategoryItems('lunette', 'Lunette AXIS Vision', 8000, 'glasses');
+        const defaultSacs = generateCategoryItems('sac', 'Sac AXIS Luxe', 12000, 'bag');
+
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 window.productsData = Object.values(data).filter(p => p !== null);
-                renderCatalog();
             }
+            renderCatalog();
         });
 
         window.filterCategory = function(category, btnElement) {
@@ -271,29 +295,50 @@
             renderCatalog();
         }
 
+        function getItemsForCategory(catKey, defaultList) {
+            let realItems = window.productsData.filter(prod => {
+                const category = (prod.category || '').toLowerCase();
+                const name = (prod.name || '').toLowerCase();
+                
+                if (catKey === 'habit') return category.includes('habit') || category.includes('vetement') || name.includes('t-shirt') || name.includes('pantalon') || category === 'axis';
+                if (catKey === 'chaussure') return category.includes('chaussure') || category.includes('basket') || name.includes('chaussure') || name.includes('basket') || name.includes('sneaker');
+                if (catKey === 'lunette') return category.includes('lunette') || name.includes('lunette');
+                if (catKey === 'sac') return category.includes('sac') || name.includes('sac');
+                return false;
+            });
+
+            // Complète avec la liste générée pour faire exactement 30 articles
+            if (realItems.length < 30) {
+                const missingCount = 30 - realItems.length;
+                return realItems.concat(defaultList.slice(0, missingCount));
+            }
+            return realItems.slice(0, 30);
+        }
+
         window.renderCatalog = function() {
             const catalogContainer = document.getElementById('catalog-products');
             if (!catalogContainer) return;
             catalogContainer.innerHTML = "";
 
-            const filteredProducts = window.productsData.filter(prod => {
-                if (window.currentCategory === 'all') return true;
-                const category = (prod.category || '').toLowerCase();
-                const name = (prod.name || '').toLowerCase();
-                
-                if (window.currentCategory === 'habit') return category.includes('habit') || category.includes('vetement') || name.includes('t-shirt') || name.includes('pantalon') || category === 'axis';
-                if (window.currentCategory === 'chaussure') return category.includes('chaussure') || category.includes('basket') || name.includes('chaussure') || name.includes('basket') || name.includes('sneaker');
-                if (window.currentCategory === 'lunette') return category.includes('lunette') || name.includes('lunette');
-                if (window.currentCategory === 'sac') return category.includes('sac') || name.includes('sac');
-                return true;
-            });
+            let displayProducts = [];
 
-            if (filteredProducts.length === 0) {
-                catalogContainer.innerHTML = `<p style="color: #888; text-align: center; width: 100%; grid-column: 1/-1;">Aucun article disponible dans cette section pour le moment.</p>`;
-                return;
+            if (window.currentCategory === 'all') {
+                const habits = getItemsForCategory('habit', defaultHabits);
+                const chaussures = getItemsForCategory('chaussure', defaultChaussures);
+                const lunettes = getItemsForCategory('lunette', defaultLunettes);
+                const sacs = getItemsForCategory('sac', defaultSacs);
+                displayProducts = [...habits, ...chaussures, ...lunettes, ...sacs];
+            } else if (window.currentCategory === 'habit') {
+                displayProducts = getItemsForCategory('habit', defaultHabits);
+            } else if (window.currentCategory === 'chaussure') {
+                displayProducts = getItemsForCategory('chaussure', defaultChaussures);
+            } else if (window.currentCategory === 'lunette') {
+                displayProducts = getItemsForCategory('lunette', defaultLunettes);
+            } else if (window.currentCategory === 'sac') {
+                displayProducts = getItemsForCategory('sac', defaultSacs);
             }
 
-            filteredProducts.forEach(prod => {
+            displayProducts.forEach(prod => {
                 const sc = prod.suppCoton || 0;
                 const sn = prod.suppNylon || 0;
 
@@ -340,12 +385,12 @@
                                 </div>
                                 <div class="option-group">
                                     <label for="quality-${prod.id}">Qualité :</label>
-                                    <select id="quality-${prod.id}" class="option-select" onchange="adjustPrice(${prod.id}, ${prod.price})">
+                                    <select id="quality-${prod.id}" class="option-select" onchange="adjustPrice('${prod.id}', ${prod.price})">
                                         ${qualityOptionsHtml}
                                     </select>
                                 </div>
                             </div>
-                            <button class="btn-add" onclick="prepareAddToCart(${prod.id}, '${safeName}', ${prod.price})">AJOUTER AU PANIER</button>
+                            <button class="btn-add" onclick="prepareAddToCart('${prod.id}', '${safeName}', ${prod.price})">AJOUTER AU PANIER</button>
                         </div>
                     </div>
                 `;
