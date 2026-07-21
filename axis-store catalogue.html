@@ -612,12 +612,6 @@
                 window.cart.push({ name, price, size, quality, quantity: 1 }); 
             }
             window.updateCartUI();
-            
-            // Ouvre automatiquement le panier lors de l'ajout
-            const cartDrawer = document.getElementById('cart-section');
-            if(!cartDrawer.classList.contains('open')) {
-                window.toggleCart();
-            }
         };
 
         window.removeFromCart = function(name, size, quality) {
