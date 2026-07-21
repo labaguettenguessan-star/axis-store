@@ -110,12 +110,17 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .image-container img { 
             max-width: 90%; 
             max-height: 90%; 
             object-fit: contain; 
+            transition: transform 0.3s ease;
+        }
+        .image-container:hover img {
+            transform: scale(1.05);
         }
 
         .badge-expert { 
@@ -192,25 +197,28 @@
             outline: none;
         }
 
+        .action-buttons {
+            display: flex;
+            margin-top: 10px;
+        }
+
         .btn-add { 
-            display: block; 
+            width: 100%;
             text-align: center; 
             background: #000000; 
             color: #ffffff; 
             border: none; 
-            padding: 12px; 
+            padding: 12px 8px; 
             border-radius: 6px; 
             font-weight: 800; 
             font-size: 0.85rem; 
-            margin-top: 10px; 
             cursor: pointer; 
             transition: background 0.2s; 
-            width: 100%; 
             letter-spacing: 0.5px;
         }
         .btn-add:hover { background: #39ff14; color: #000000; }
 
-        /* --- BOUTON PANIER FLOTTANT --- */
+        /* BOUTON PANIER FLOTTANT */
         .cart-toggle-btn {
             position: fixed;
             bottom: 25px;
@@ -230,9 +238,16 @@
             gap: 10px;
             transition: transform 0.2s;
         }
-        .cart-toggle-btn:hover {
-            transform: scale(1.05);
+        .cart-toggle-btn:hover { transform: scale(1.05); }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
+        .cart-toggle-btn.bounce-anim {
+            animation: bounce 0.4s ease infinite alternate;
+        }
+
         .cart-badge {
             background: #000;
             color: #39ff14;
@@ -241,7 +256,29 @@
             font-size: 0.85rem;
         }
 
-        /* --- PANNEAU PANIER FLOTTANT (DRAWER) --- */
+        /* TOAST NOTIFICATION */
+        .toast-notification {
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            background: #39ff14;
+            color: #000;
+            font-weight: 800;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1005;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* PANNEAU PANIER FLOTTANT (DRAWER) */
         .cart-overlay {
             position: fixed;
             top: 0;
@@ -253,9 +290,7 @@
             display: none;
             backdrop-filter: blur(3px);
         }
-        .cart-overlay.active {
-            display: block;
-        }
+        .cart-overlay.active { display: block; }
 
         .cart-container { 
             position: fixed;
@@ -273,9 +308,7 @@
             display: flex;
             flex-direction: column;
         }
-        .cart-container.open {
-            right: 0;
-        }
+        .cart-container.open { right: 0; }
 
         .cart-header {
             display: flex;
@@ -297,6 +330,21 @@
 
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #000; }
         .cart-item-meta { font-size: 0.78rem; color: #666; display: block; margin-top: 2px; }
+        .qty-controls { display: flex; align-items: center; gap: 6px; }
+        .qty-btn {
+            background: #eee;
+            border: 1px solid #ccc;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:hover { background: #ddd; }
+        
         .cart-total { font-size: 1.2rem; font-weight: bold; margin-top: 15px; text-align: right; color: #000; }
         
         .form-group { margin-top: 12px; }
@@ -306,6 +354,22 @@
         .cart-actions { display: flex; gap: 10px; margin-top: 18px; }
         .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
         .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; }
+
+        /* MODAL LIGHTBOX IMAGE */
+        .lightbox-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1005;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-modal.active { display: flex; }
+        .lightbox-modal img { max-width: 90%; max-height: 85vh; border-radius: 8px; border: 2px solid #39ff14; }
 
         footer { text-align: center; padding: 25px; margin-top: 40px; color: #666; border-top: 1px solid #222; font-size: 0.85rem; }
     </style>
@@ -365,12 +429,20 @@
     </div>
 
     <!-- BOUTON PANIER FLOTTANT -->
-    <button class="cart-toggle-btn" onclick="toggleCart()">
+    <button class="cart-toggle-btn" id="cart-float-btn" onclick="toggleCart()">
         🛒 Panier <span class="cart-badge" id="cart-count-float">0</span>
     </button>
 
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-notification" id="toast">Produit ajouté au panier !</div>
+
     <!-- OVERLAY OBSCURCISSEUR -->
     <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+    <!-- LIGHTBOX IMAGE ZOOM -->
+    <div class="lightbox-modal" id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Zoom Image">
+    </div>
 
     <!-- PANNEAU PANIER FLOTTANT -->
     <div id="cart-section" class="cart-container">
@@ -393,8 +465,15 @@
             <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
         </div>
         <div class="form-group">
-            <label for="client-delivery">Adresse de livraison :</label>
-            <input type="text" id="client-delivery" placeholder="Ex: Abidjan, Cocody">
+            <label for="delivery-zone">Zone de Livraison :</label>
+            <select id="delivery-zone" onchange="updateCartUI()">
+                <option value="950">Abidjan (950 F)</option>
+                <option value="0">Hors Abidjan / Intérieur du pays (À convenir avec le livreur)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="client-delivery">Adresse exacte / Lieu de rendez-vous :</label>
+            <input type="text" id="client-delivery" placeholder="Ex: Cocody Angré PétroIvoire / Gare de Yamoussoukro">
         </div>
         <div class="form-group">
             <label for="payment-method">Moyen de paiement :</label>
@@ -405,8 +484,8 @@
         </div>
 
         <div class="cart-actions">
-            <button class="btn-cancel" onclick="clearCart()">Décommander</button>
-            <button class="btn-order" onclick="sendOrder()">Commander</button>
+            <button class="btn-cancel" onclick="clearCart()">Vider</button>
+            <button class="btn-order" onclick="sendOrder()">Commander via WA</button>
         </div>
     </div>
 
@@ -432,14 +511,41 @@
         const db = getDatabase(app);
 
         window.MERCHANT_NUMBER = "2250720648060"; 
-        window.cart = [];
+        
+        // RECUPERATION DU PANIER DEPUIS LOCALSTORAGE
+        window.cart = JSON.parse(localStorage.getItem('axis_cart')) || [];
         window.allProducts = [];
 
-        // OUVERTURE / FERMETURE DU PANIER FLOTTANT
+        // ENREGISTREMENT LOCALSTORAGE
+        window.saveCart = function() {
+            localStorage.setItem('axis_cart', JSON.stringify(window.cart));
+        };
+
+        // NOTIFICATION TOAST
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+
+            const floatBtn = document.getElementById('cart-float-btn');
+            floatBtn.classList.add('bounce-anim');
+            setTimeout(() => floatBtn.classList.remove('bounce-anim'), 800);
+        };
+
+        // ZOOM IMAGE (LIGHTBOX)
+        window.openLightbox = function(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        };
+        window.closeLightbox = function() {
+            document.getElementById('lightbox').classList.remove('active');
+        };
+
+        // OUVERTURE / FERMETURE DU PANIER
         window.toggleCart = function() {
             const cartDrawer = document.getElementById('cart-section');
             const cartOverlay = document.getElementById('cart-overlay');
-            
             cartDrawer.classList.toggle('open');
             cartOverlay.classList.toggle('active');
         };
@@ -471,6 +577,7 @@
                 window.allProducts = items;
             }
             renderAllGrids();
+            updateCartUI();
         });
 
         window.renderAllGrids = function() {
@@ -556,7 +663,7 @@
 
                     container.innerHTML += `
                         <div class="product-card">
-                            <div class="image-container">
+                            <div class="image-container" onclick="openLightbox('${displayImg}')">
                                 <span class="badge-expert">${displayBadge}</span>
                                 <img src="${displayImg}" alt="${safeName}">
                             </div>
@@ -576,7 +683,9 @@
                                         <select id="quality-${prodId}" class="option-select" onchange="adjustPrice('${prodId}', ${basePrice})">${opt2Html}</select>
                                     </div>
                                 </div>
-                                <button class="btn-add" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER AU PANIER</button>
+                                <div class="action-buttons">
+                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -602,6 +711,20 @@
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
             
             window.addToCart(name, originalPrice + extra, size, qualityLabel);
+
+            // Animation visuelle du bouton
+            const btn = document.getElementById(`btn-add-${productId}`);
+            if(btn) {
+                const origText = btn.innerText;
+                btn.innerText = "AJOUTÉ ! ✔️";
+                btn.style.background = "#39ff14";
+                btn.style.color = "#000";
+                setTimeout(() => {
+                    btn.innerText = origText;
+                    btn.style.background = "#000";
+                    btn.style.color = "#fff";
+                }, 1500);
+            }
         };
 
         window.addToCart = function(name, price, size, quality) {
@@ -611,82 +734,115 @@
             } else { 
                 window.cart.push({ name, price, size, quality, quantity: 1 }); 
             }
+            window.saveCart();
             window.updateCartUI();
+            window.showToast("Produit ajouté au panier !");
         };
-
-        window.removeFromCart = function(name, size, quality) {
-            window.cart = window.cart.filter(item => !(item.name === name && item.size === size && item.quality === quality));
-            window.updateCartUI();
-        };
-
-        window.clearCart = function() { window.cart = []; window.updateCartUI(); };
 
         window.updateCartUI = function() {
-            const cartItemsDiv = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const countSpan = document.getElementById('cart-count');
-            const countNavSpan = document.getElementById('cart-count-nav');
-            const countFloatSpan = document.getElementById('cart-count-float');
-            let total = 0; let totalItems = 0;
+            const cartItemsEl = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const cartCountEl = document.getElementById('cart-count');
+            const cartCountNav = document.getElementById('cart-count-nav');
+            const cartCountFloat = document.getElementById('cart-count-float');
+
+            if (!cartItemsEl) return;
+
+            let total = 0;
+            let count = 0;
 
             if (window.cart.length === 0) {
-                cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
-                cartTotal.innerText = '0';
-                if(countSpan) countSpan.innerText = '0';
-                if(countNavSpan) countNavSpan.innerText = '0';
-                if(countFloatSpan) countFloatSpan.innerText = '0';
-                return;
+                cartItemsEl.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
+            } else {
+                cartItemsEl.innerHTML = window.cart.map((item, idx) => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    count += item.quantity;
+
+                    return `
+                        <div class="cart-item">
+                            <div>
+                                <strong>${item.name}</strong>
+                                <span class="cart-item-meta">${item.size} | ${item.quality}</span>
+                                <div>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></div>
+                            </div>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="changeQty(${idx}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
 
-            cartItemsDiv.innerHTML = '';
-            window.cart.forEach(item => {
-                total += item.price * item.quantity;
-                totalItems += item.quantity;
-                const safeName = item.name.replace(/'/g, "\\'");
-                const safeQuality = item.quality.replace(/'/g, "\\'");
-                cartItemsDiv.innerHTML += `
-                    <div class="cart-item">
-                        <div>
-                            <span>${item.name} (x${item.quantity})</span>
-                            <span class="cart-item-meta">Opt: ${item.size} | ${item.quality}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
-                            <button class="btn-remove" type="button" onclick="event.stopPropagation(); removeFromCart('${safeName}', '${item.size}', '${safeQuality}')" style="color:red; background:none; border:none; cursor:pointer;">❌</button>
-                        </div>
-                    </div>
-                `;
-            });
-            cartTotal.innerText = total.toLocaleString();
-            if(countSpan) countSpan.innerText = totalItems;
-            if(countNavSpan) countNavSpan.innerText = totalItems;
-            if(countFloatSpan) countFloatSpan.innerText = totalItems;
+            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || 0);
+            const grandTotal = total + deliveryFee;
+
+            if (cartTotalEl) cartTotalEl.innerText = grandTotal.toLocaleString();
+            if (cartCountEl) cartCountEl.innerText = count;
+            if (cartCountNav) cartCountNav.innerText = count;
+            if (cartCountFloat) cartCountFloat.innerText = count;
+        };
+
+        window.changeQty = function(idx, delta) {
+            if (window.cart[idx]) {
+                window.cart[idx].quantity += delta;
+                if (window.cart[idx].quantity <= 0) {
+                    window.cart.splice(idx, 1);
+                }
+                window.saveCart();
+                window.updateCartUI();
+            }
+        };
+
+        window.clearCart = function() {
+            window.cart = [];
+            window.saveCart();
+            window.updateCartUI();
         };
 
         window.sendOrder = function() {
+            if (window.cart.length === 0) {
+                alert("Votre panier est vide !");
+                return;
+            }
+
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
-            const paymentMethod = document.getElementById('payment-method').value;
+            const deliverySelect = document.getElementById('delivery-zone');
+            const deliveryZoneText = deliverySelect.options[deliverySelect.selectedIndex].text;
+            const deliveryFee = parseInt(deliverySelect.value);
+            const payment = document.getElementById('payment-method').value;
 
-            if (window.cart.length === 0 || !name || !phone || !delivery) {
-                return alert("Veuillez remplir vos informations (Nom, Téléphone, Adresse) et ajouter au moins un produit au panier.");
+            if (!name || !phone || !delivery) {
+                alert("Veuillez remplir votre nom, téléphone et adresse de livraison.");
+                return;
             }
 
-            let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📞 *Téléphone :* ${phone}\n📍 *Livraison :* ${delivery}\n💳 *Paiement :* ${paymentMethod}\n\n📦 *Articles :*\n`;
-            let total = 0;
-            window.cart.forEach(item => {
-                const subtotal = item.price * item.quantity; 
-                total += subtotal;
-                message += `- ${item.name} (x${item.quantity}) | Options: ${item.size} - ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
+            let text = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n`;
+            text += `👤 *Nom :* ${name}\n`;
+            text += `📞 *Téléphone :* ${phone}\n`;
+            text += `📍 *Adresse :* ${delivery}\n`;
+            text += `🚚 *Livraison :* ${deliveryZoneText}\n`;
+            text += `💳 *Paiement :* ${payment}\n\n`;
+            text += `📦 *PRODUITS :*\n`;
+
+            let itemsTotal = 0;
+            window.cart.forEach((item, i) => {
+                const sub = item.price * item.quantity;
+                itemsTotal += sub;
+                text += `${i+1}. ${item.name} (${item.size} / ${item.quality}) x${item.quantity} - ${sub.toLocaleString()} FCFA\n`;
             });
-            message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
 
-            if (paymentMethod === "Wave") {
-                message += `\n\n🔗 *Lien de règlement Wave :* https://wave.com/send?phone=+${window.MERCHANT_NUMBER}`;
-            }
+            const grandTotal = itemsTotal + deliveryFee;
+            text += `\n💰 *Total Produits :* ${itemsTotal.toLocaleString()} FCFA\n`;
+            if (deliveryFee > 0) text += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
+            text += `🔥 *TOTAL À PAYER :* ${grandTotal.toLocaleString()} FCFA`;
 
-            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+            const url = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
         };
     </script>
 </body>
