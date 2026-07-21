@@ -258,19 +258,19 @@
     <p class="subtitle">Revendeur officiel.</p>
 
     <div class="category-filter-bar">
-        <button class="btn-cat-filter active" onclick="switchSection('vetements', this)">👕 vetements</button>
+        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Habits</button>
         <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
         <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
         <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
-        <button class="btn-cat-filter" onclick="switchSection('accessoires', this)">⌚ Accessoires</button>
+        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Montres</button>
     </div>
 
     <div class="main-container">
         <div class="catalog-container">
             
-            <section id="sec-vetements" class="section-block active">
-                <h2 class="section-title">👕 Collection vetements</h2>
-                <div class="catalog-grid" id="grid-vetement"></div>
+            <section id="sec-habit" class="section-block active">
+                <h2 class="section-title">👕 Collection Habits</h2>
+                <div class="catalog-grid" id="grid-habit"></div>
             </section>
 
             <section id="sec-chaussure" class="section-block">
@@ -288,9 +288,9 @@
                 <div class="catalog-grid" id="grid-sac"></div>
             </section>
 
-            <section id="sec-accessoires" class="section-block">
-                <h2 class="section-title">⌚ Collection Accessoires</h2>
-                <div class="catalog-grid" id="grid-accessoires"></div>
+            <section id="sec-montre" class="section-block">
+                <h2 class="section-title">⌚ Collection Montres</h2>
+                <div class="catalog-grid" id="grid-montre"></div>
             </section>
 
         </div>
@@ -386,7 +386,7 @@
         });
 
         window.renderAllGrids = function() {
-            const sections = ['vetements', 'chaussure', 'lunette', 'sac', 'accessoirs'];
+            const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
 
             sections.forEach(catKey => {
                 const container = document.getElementById(`grid-${catKey}`);
@@ -422,7 +422,7 @@
                     const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
                     const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
 
-                    if (catKey === 'vetements') {
+                    if (catKey === 'habit') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
                         const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
                         const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
@@ -453,7 +453,7 @@
                             <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
-                    } else if (catKey === 'accessoires') {
+                    } else if (catKey === 'montre') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
                         opt2Html = `
