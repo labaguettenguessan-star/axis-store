@@ -304,7 +304,7 @@
 
             <div class="form-group">
                 <label for="client-name">Votre Nom :</label>
-                <input type="text" id="client-name" placeholder="Ex: Jean punk">
+                <input type="text" id="client-name" placeholder="Ex: Jean Punk">
             </div>
             <div class="form-group">
                 <label for="client-phone">Numéro de Téléphone :</label>
@@ -396,20 +396,21 @@
                 };
 
                 const config = configSection[catKey];
+                const displayCount = items.length > 0 ? items.length : 12;
 
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < displayCount; i++) {
                     const prod = items[i];
 
                     let opt1Html = '';
                     let opt2Html = '';
-                    const basePrice = prod ? (prod.price || 0) : 15000;
-                    const prodId = prod ? prod.id : `${catKey}-demo-${i}`;
-                    const prodName = prod ? prod.name : `Emplacement N°${i+1}`;
+                    const basePrice = prod ? (parseInt(prod.price) || 0) : 15000;
+                    const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
+                    const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
 
                     if (catKey === 'habit') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
-                        const sc = prod ? (prod.suppCoton || 0) : 0;
-                        const sn = prod ? (prod.suppNylon || 0) : 0;
+                        const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
+                        const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
                         opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
                         opt2Html = `
                             <option value="Coton" data-extra="${sc}">Coton (+${sc} F)</option>
@@ -417,28 +418,28 @@
                         `;
                     } else if (catKey === 'chaussure') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['39', '40', '41', '42', '43', '44'];
-                        const suppSema = prod ? (prod.suppSemelle || 0) : 0;
+                        const suppSema = prod ? (parseInt(prod.suppSemelle) || 0) : 0;
                         opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
                         opt2Html = `
                             <option value="Standard" data-extra="0">Standard (+0 F)</option>
                             <option value="Orthopédique" data-extra="${suppSema}">Orthopédique (+${suppSema} F)</option>
                         `;
                     } else if (catKey === 'lunette') {
-                        const suppPola = prod ? (prod.suppPolarise || 0) : 0;
+                        const suppPola = prod ? (parseInt(prod.suppPolarise) || 0) : 0;
                         opt1Html = `<option value="Unique">Unique</option>`;
                         opt2Html = `
                             <option value="UV400" data-extra="0">UV400 (+0 F)</option>
                             <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
                         `;
                     } else if (catKey === 'sac') {
-                        const suppCuir = prod ? (prod.suppCuir || 0) : 0;
+                        const suppCuir = prod ? (parseInt(prod.suppCuir) || 0) : 0;
                         opt1Html = `<option value="Standard">Standard</option><option value="Grand Format">Grand Format</option>`;
                         opt2Html = `
                             <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
                     } else if (catKey === 'montre') {
-                        const suppAcier = prod ? (prod.suppAcier || 0) : 0;
+                        const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
                         opt2Html = `
                             <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
@@ -447,7 +448,7 @@
                     }
 
                     const safeName = prodName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                    const displayImg = prod ? (prod.image || 'https://via.placeholder.com/200') : 'https://via.placeholder.com/200';
+                    const displayImg = prod ? (prod.image || 'https://via.placeholder.com/260') : 'https://via.placeholder.com/260';
                     const displayBadge = prod ? (prod.badge || 'Disponible') : 'Stock Limité';
 
                     container.innerHTML += `
@@ -502,7 +503,11 @@
 
         window.addToCart = function(name, price, size, quality) {
             const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
-            if (existingItem) { existingItem.quantity += 1; } else { window.cart.push({ name, price, size, quality, quantity: 1 }); }
+            if (existingItem) { 
+                existingItem.quantity += 1; 
+            } else { 
+                window.cart.push({ name, price, size, quality, quantity: 1 }); 
+            }
             window.updateCartUI();
         };
 
@@ -558,12 +563,15 @@
             const delivery = document.getElementById('client-delivery').value.trim();
             const paymentMethod = document.getElementById('payment-method').value;
 
-            if (window.cart.length === 0 || !name || !phone || !delivery) return alert("Remplissez vos infos (Nom, Téléphone, Adresse) et votre panier.");
+            if (window.cart.length === 0 || !name || !phone || !delivery) {
+                return alert("Veuillez remplir vos informations (Nom, Téléphone, Adresse) et ajouter au moins un produit au panier.");
+            }
 
             let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📞 *Téléphone :* ${phone}\n📍 *Livraison :* ${delivery}\n💳 *Paiement :* ${paymentMethod}\n\n📦 *Articles :*\n`;
             let total = 0;
             window.cart.forEach(item => {
-                const subtotal = item.price * item.quantity; total += subtotal;
+                const subtotal = item.price * item.quantity; 
+                total += subtotal;
                 message += `- ${item.name} (x${item.quantity}) | Options: ${item.size} - ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
             });
             message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
@@ -576,7 +584,8 @@
         };
 
         document.getElementById('cart-nav-btn').addEventListener('click', function(e) {
-            e.preventDefault(); document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
+            e.preventDefault(); 
+            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
         });
     </script>
 </body>
