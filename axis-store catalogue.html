@@ -369,13 +369,16 @@
             if (!data) {
                 window.allProducts = [];
             } else {
-                // Maintient l'ordre exact de la base de données Firebase / Dashboard
-                let items = Object.keys(data)
-                    .filter(key => data[key] !== null)
-                    .map(key => ({ id: key, ...data[key] }));
+                // 1. Inversion de l'ordre d'extraction pour placer le tout premier produit ajouté en Haut
+                let keys = Object.keys(data).filter(key => data[key] !== null).reverse();
+                let items = keys.map(key => ({ id: key, ...data[key] }));
 
-                // Si les produits ont un attribut 'order' ou 'createdAt', on peut les trier ici:
-                // items.sort((a, b) => (a.order || 0) - (b.order || 0));
+                // 2. Si le dashboard utilise un champ 'createdAt' ou 'order', tri dynamique garanti :
+                if (items.length > 0 && items[0].createdAt) {
+                    items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                } else if (items.length > 0 && items[0].order !== undefined) {
+                    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+                }
 
                 window.allProducts = items;
             }
