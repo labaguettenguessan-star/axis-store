@@ -34,7 +34,7 @@
             border-bottom: 1px solid #222;
         }
         nav ul { display: flex; list-style: none; gap: 25px; }
-        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
         nav a:hover { color: #39ff14; }
         .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
         .logo span { color: #39ff14; }
@@ -69,7 +69,7 @@
             box-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
         }
 
-        .main-container { display: flex; flex-direction: column; gap: 25px; }
+        .main-container { display: block; }
 
         .section-block { display: none; margin-bottom: 40px; }
         .section-block.active { display: block; }
@@ -83,7 +83,7 @@
             letter-spacing: 1px;
         }
 
-        .catalog-container { flex: 3; }
+        .catalog-container { width: 100%; }
         .catalog-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -191,7 +191,6 @@
             cursor: pointer; 
             outline: none;
         }
-        .option-select:focus { border-color: #000000 !important; }
 
         .btn-add { 
             display: block; 
@@ -211,18 +210,91 @@
         }
         .btn-add:hover { background: #39ff14; color: #000000; }
 
-        /* PANIER */
-        .cart-container { 
-            flex: 1; 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 10px; 
-            border: 1px solid #eee; 
-            height: max-content; 
-            position: sticky; 
-            top: 100px; 
+        /* --- BOUTON PANIER FLOTTANT --- */
+        .cart-toggle-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            padding: 15px 22px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(57, 255, 20, 0.5);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
         }
-        .cart-container h2 { font-size: 1.25rem; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #000; color: #000; }
+        .cart-toggle-btn:hover {
+            transform: scale(1.05);
+        }
+        .cart-badge {
+            background: #000;
+            color: #39ff14;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* --- PANNEAU PANIER FLOTTANT (DRAWER) --- */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1002;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        .cart-overlay.active {
+            display: block;
+        }
+
+        .cart-container { 
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            max-width: 90%;
+            height: 100%;
+            background: #ffffff; 
+            padding: 25px; 
+            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+            z-index: 1003;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-container.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .cart-header h2 { font-size: 1.25rem; color: #000; margin: 0; }
+        .close-cart-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+        }
+
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #000; }
         .cart-item-meta { font-size: 0.78rem; color: #666; display: block; margin-top: 2px; }
         .cart-total { font-size: 1.2rem; font-weight: bold; margin-top: 15px; text-align: right; color: #000; }
@@ -236,10 +308,6 @@
         .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; }
 
         footer { text-align: center; padding: 25px; margin-top: 40px; color: #666; border-top: 1px solid #222; font-size: 0.85rem; }
-
-        @media (min-width: 1024px) { 
-            .main-container { flex-direction: row; }
-        }
     </style>
 </head>
 <body>
@@ -247,7 +315,7 @@
         <nav>
             <ul>
                 <li><a href="axis-store acceuil.html">Accueil</a></li>
-                <li><a href="#" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
+                <li><a onclick="toggleCart()">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
         </nav>
@@ -294,38 +362,51 @@
             </section>
 
         </div>
+    </div>
 
-        <div id="cart-section" class="cart-container">
+    <!-- BOUTON PANIER FLOTTANT -->
+    <button class="cart-toggle-btn" onclick="toggleCart()">
+        🛒 Panier <span class="cart-badge" id="cart-count-float">0</span>
+    </button>
+
+    <!-- OVERLAY OBSCURCISSEUR -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+    <!-- PANNEAU PANIER FLOTTANT -->
+    <div id="cart-section" class="cart-container">
+        <div class="cart-header">
             <h2>Mon Panier (<span id="cart-count">0</span>)</h2>
-            <div id="cart-items" style="margin-top: 15px;">
-                <p style="color: #888; font-style: italic;">Votre panier est vide.</p>
-            </div>
-            <div class="cart-total">Total: <span id="cart-total">0</span> FCFA</div>
+            <button class="close-cart-btn" onclick="toggleCart()">&times;</button>
+        </div>
+        
+        <div id="cart-items">
+            <p style="color: #888; font-style: italic;">Votre panier est vide.</p>
+        </div>
+        <div class="cart-total">Total: <span id="cart-total">0</span> FCFA</div>
 
-            <div class="form-group">
-                <label for="client-name">Votre Nom :</label>
-                <input type="text" id="client-name" placeholder="Ex: Jean Punk">
-            </div>
-            <div class="form-group">
-                <label for="client-phone">Numéro de Téléphone :</label>
-                <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
-            </div>
-            <div class="form-group">
-                <label for="client-delivery">Adresse de livraison :</label>
-                <input type="text" id="client-delivery" placeholder="Ex: Abidjan, Cocody">
-            </div>
-            <div class="form-group">
-                <label for="payment-method">Moyen de paiement :</label>
-                <select id="payment-method">
-                    <option value="Wave">Wave Mobile Money</option>
-                    <option value="Espèces à la livraison">Espèces à la livraison</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="client-name">Votre Nom :</label>
+            <input type="text" id="client-name" placeholder="Ex: Jean Punk">
+        </div>
+        <div class="form-group">
+            <label for="client-phone">Numéro de Téléphone :</label>
+            <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
+        </div>
+        <div class="form-group">
+            <label for="client-delivery">Adresse de livraison :</label>
+            <input type="text" id="client-delivery" placeholder="Ex: Abidjan, Cocody">
+        </div>
+        <div class="form-group">
+            <label for="payment-method">Moyen de paiement :</label>
+            <select id="payment-method">
+                <option value="Wave">Wave Mobile Money</option>
+                <option value="Espèces à la livraison">Espèces à la livraison</option>
+            </select>
+        </div>
 
-            <div class="cart-actions">
-                <button class="btn-cancel" onclick="clearCart()">Décommander</button>
-                <button class="btn-order" onclick="sendOrder()">Commander</button>
-            </div>
+        <div class="cart-actions">
+            <button class="btn-cancel" onclick="clearCart()">Décommander</button>
+            <button class="btn-order" onclick="sendOrder()">Commander</button>
         </div>
     </div>
 
@@ -354,6 +435,15 @@
         window.cart = [];
         window.allProducts = [];
 
+        // OUVERTURE / FERMETURE DU PANIER FLOTTANT
+        window.toggleCart = function() {
+            const cartDrawer = document.getElementById('cart-section');
+            const cartOverlay = document.getElementById('cart-overlay');
+            
+            cartDrawer.classList.toggle('open');
+            cartOverlay.classList.toggle('active');
+        };
+
         window.switchSection = function(catKey, btnElement) {
             document.querySelectorAll('.section-block').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.btn-cat-filter').forEach(btn => btn.classList.remove('active'));
@@ -369,11 +459,9 @@
             if (!data) {
                 window.allProducts = [];
             } else {
-                // 1. Inversion de l'ordre d'extraction pour placer le tout premier produit ajouté en Haut
                 let keys = Object.keys(data).filter(key => data[key] !== null).reverse();
                 let items = keys.map(key => ({ id: key, ...data[key] }));
 
-                // 2. Si le dashboard utilise un champ 'createdAt' ou 'order', tri dynamique garanti :
                 if (items.length > 0 && items[0].createdAt) {
                     items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 } else if (items.length > 0 && items[0].order !== undefined) {
@@ -524,6 +612,12 @@
                 window.cart.push({ name, price, size, quality, quantity: 1 }); 
             }
             window.updateCartUI();
+            
+            // Ouvre automatiquement le panier lors de l'ajout
+            const cartDrawer = document.getElementById('cart-section');
+            if(!cartDrawer.classList.contains('open')) {
+                window.toggleCart();
+            }
         };
 
         window.removeFromCart = function(name, size, quality) {
@@ -538,6 +632,7 @@
             const cartTotal = document.getElementById('cart-total');
             const countSpan = document.getElementById('cart-count');
             const countNavSpan = document.getElementById('cart-count-nav');
+            const countFloatSpan = document.getElementById('cart-count-float');
             let total = 0; let totalItems = 0;
 
             if (window.cart.length === 0) {
@@ -545,6 +640,7 @@
                 cartTotal.innerText = '0';
                 if(countSpan) countSpan.innerText = '0';
                 if(countNavSpan) countNavSpan.innerText = '0';
+                if(countFloatSpan) countFloatSpan.innerText = '0';
                 return;
             }
 
@@ -570,6 +666,7 @@
             cartTotal.innerText = total.toLocaleString();
             if(countSpan) countSpan.innerText = totalItems;
             if(countNavSpan) countNavSpan.innerText = totalItems;
+            if(countFloatSpan) countFloatSpan.innerText = totalItems;
         };
 
         window.sendOrder = function() {
@@ -597,11 +694,6 @@
 
             window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
         };
-
-        document.getElementById('cart-nav-btn').addEventListener('click', function(e) {
-            e.preventDefault(); 
-            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
-        });
     </script>
 </body>
 </html>
