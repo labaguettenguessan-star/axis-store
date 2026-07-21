@@ -366,7 +366,19 @@
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
-            window.allProducts = data ? Object.values(data).filter(p => p !== null) : [];
+            if (!data) {
+                window.allProducts = [];
+            } else {
+                // Maintient l'ordre exact de la base de données Firebase / Dashboard
+                let items = Object.keys(data)
+                    .filter(key => data[key] !== null)
+                    .map(key => ({ id: key, ...data[key] }));
+
+                // Si les produits ont un attribut 'order' ou 'createdAt', on peut les trier ici:
+                // items.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                window.allProducts = items;
+            }
             renderAllGrids();
         });
 
