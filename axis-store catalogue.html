@@ -386,7 +386,7 @@
         });
 
         window.renderAllGrids = function() {
-            const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
+            const sections = ['vetements', 'chaussure', 'lunette', 'sac', 'accessoirs'];
 
             sections.forEach(catKey => {
                 const container = document.getElementById(`grid-${catKey}`);
@@ -422,7 +422,7 @@
                     const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
                     const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
 
-                    if (catKey === 'habit') {
+                    if (catKey === 'vetements') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
                         const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
                         const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
@@ -453,7 +453,7 @@
                             <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
-                    } else if (catKey === 'montre') {
+                    } else if (catKey === 'accessoires') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
                         opt2Html = `
