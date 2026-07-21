@@ -7,81 +7,52 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             line-height: 1.5; 
-            color: #111; 
+            color: #333; 
             max-width: 1400px; 
             margin: 0 auto; 
             padding: 20px; 
-            background-color: #0d0d0d; 
+            background-color: #101010; 
             font-size: 16px;
             padding-top: 90px;
         }
-
-        /* HEADER & NAVIGATION */
+        h1 { text-align: center; color: #39ff14; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: right; margin-bottom: 2px; order: 2; }
+        .logo span { color: #39ff14; }
+        
         header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            background: #000000; 
+            background: #070707; 
             color: #fff; 
-            padding: 15px 25px; 
+            padding: 15px 20px; 
+            margin-bottom: 20px; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 1000;
+            box-sizing: border-box;
             border-bottom: 1px solid #222;
         }
-        nav ul { display: flex; list-style: none; gap: 25px; }
-        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+        nav { order: 1; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
         nav a:hover { color: #39ff14; }
-        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
-        .logo span { color: #39ff14; }
 
-        h1 { text-align: center; color: #39ff14; margin-bottom: 5px; font-weight: 800; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 25px; }
-
-        /* FILTRES CATÉGORIES */
-        .category-filter-bar {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .btn-cat-filter {
-            background: #181818;
-            color: #ccc;
-            border: 1px solid #333;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        .btn-cat-filter:hover, .btn-cat-filter.active {
-            background: #39ff14;
-            color: #000;
-            border-color: #39ff14;
-            font-weight: 700;
-            box-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
+        @media (max-width: 768px) {
+            header { padding: 12px; }
+            header nav { width: 100%; }
+            header nav ul { display: flex; justify-content: space-around; width: 100%; padding: 0; margin: 0; list-style: none; gap: 10px; }
+            header nav ul li a { font-size: 13px; padding: 5px 5px; }
+            .logo { display: none; }
         }
 
         .main-container { display: flex; flex-direction: column; gap: 25px; }
-
-        .section-block { display: none; margin-bottom: 40px; }
-        .section-block.active { display: block; }
-        .section-title {
-            color: #fff;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #39ff14;
-            padding-bottom: 8px;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
 
         .catalog-container { flex: 3; }
         .catalog-grid { 
@@ -91,21 +62,23 @@
         }
         
         .product-card { 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
+            border: 1px solid #222; 
+            border-radius: 10px; 
             overflow: hidden; 
-            background: #ffffff !important; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: #fff; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s;
             position: relative;
         }
+        .product-card:hover { transform: translateY(-3px); }
         
         .image-container { 
             position: relative; 
             width: 100%; 
-            height: 260px; 
-            background: #f7f7f7; 
+            height: 240px; 
+            background: #f0f0f0; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -113,131 +86,60 @@
         }
 
         .image-container img { 
-            max-width: 90%; 
-            max-height: 90%; 
+            max-width: 100%; 
+            max-height: 100%; 
             object-fit: contain; 
         }
 
         .badge-expert { 
             position: absolute; 
-            top: 12px; 
-            left: 12px; 
-            background: #e67e22 !important; 
-            color: #ffffff !important; 
-            font-size: 0.75rem; 
-            padding: 4px 10px; 
+            top: 10px; 
+            left: 10px; 
+            background: #e67e22; 
+            color: white; 
+            font-size: 0.75em; 
+            padding: 4px 8px; 
             border-radius: 4px; 
-            font-weight: 700;
-            text-transform: capitalize;
+            font-weight: bold;
             z-index: 5;
-            letter-spacing: 0.5px;
         }
 
-        .product-info { 
-            padding: 16px; 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            background: #ffffff !important;
-        }
+        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+        .brand { font-size: 0.8em; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 1px; }
+        .model-name { font-size: 1.1em; font-weight: bold; color: #111; }
+        .price { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
+        .expert-note { background: #f9f9f9; padding: 10px; border-left: 3px solid #111; font-size: 0.85em; color: #555; border-radius: 0 4px 4px 0; }
         
-        .brand { 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            color: #888888 !important; 
-            font-weight: 800; 
-            letter-spacing: 1px; 
-        }
-        
-        .model-name { 
-            font-size: 1.15rem; 
-            font-weight: 800; 
-            color: #000000 !important; 
-            line-height: 1.25;
-            margin-top: -2px;
-        }
-        
-        .price { 
-            font-size: 1.35rem; 
-            font-weight: 800; 
-            color: #1a365d !important; 
-            margin-bottom: 2px;
-        }
-        
-        .expert-note { 
-            background: #f5f5f5 !important; 
-            padding: 10px 12px; 
-            border-left: 3px solid #000000 !important; 
-            font-size: 0.85rem; 
-            color: #555555 !important; 
-            border-radius: 0 4px 4px 0; 
-            line-height: 1.4;
-        }
-        .expert-note strong { color: #000000 !important; }
-        
-        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .options-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
         .option-group { display: flex; flex-direction: column; gap: 4px; }
-        .option-group label { font-size: 0.82rem; font-weight: 700; color: #333333; }
+        .option-group label { font-size: 0.8em; font-weight: bold; color: #555; }
+        .option-select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9em; background: #fff; width: 100%; cursor: pointer; }
+
+        .btn-add { display: block; text-align: center; background: #111; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.9em; margin-top: auto; cursor: pointer; transition: background 0.2s; width: 100%; }
+        .btn-add:hover { background: #333; }
+
+        .cart-container { flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; height: max-content; position: sticky; top: 100px; }
+        .cart-container h2 { font-size: 1.3em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #111; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.95em; }
+        .cart-item-meta { font-size: 0.8em; color: #666; display: block; margin-top: 2px; }
         
-        .option-select { 
-            padding: 9px 12px; 
-            border: 1px solid #e0e0e0 !important; 
-            border-radius: 6px; 
-            font-size: 0.9rem; 
-            background: #ffffff !important; 
-            color: #111111 !important;
-            width: 100%; 
-            cursor: pointer; 
-            outline: none;
-        }
-        .option-select:focus { border-color: #000000 !important; }
-
-        .btn-add { 
-            display: block; 
-            text-align: center; 
-            background: #000000; 
-            color: #ffffff; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 6px; 
-            font-weight: 800; 
-            font-size: 0.85rem; 
-            margin-top: 10px; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-            width: 100%; 
-            letter-spacing: 0.5px;
-        }
-        .btn-add:hover { background: #39ff14; color: #000000; }
-
-        /* PANIER */
-        .cart-container { 
-            flex: 1; 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 10px; 
-            border: 1px solid #eee; 
-            height: max-content; 
-            position: sticky; 
-            top: 100px; 
-        }
-        .cart-container h2 { font-size: 1.25rem; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #000; color: #000; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #000; }
-        .cart-item-meta { font-size: 0.78rem; color: #666; display: block; margin-top: 2px; }
-        .cart-total { font-size: 1.2rem; font-weight: bold; margin-top: 15px; text-align: right; color: #000; }
+        .btn-remove { background: none; border: none; cursor: pointer; font-size: 1.2rem; display: inline-block; line-height: 1; padding: 2px 5px; }
+        .cart-total { font-size: 1.2em; font-weight: bold; margin-top: 15px; text-align: right; color: #111; }
         
-        .form-group { margin-top: 12px; }
-        .form-group label { display: block; margin-bottom: 4px; font-size: 0.82rem; font-weight: bold; color: #333; }
-        .form-group input { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 6px; }
+        .form-group { margin-top: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.85em; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
 
-        .cart-actions { display: flex; gap: 10px; margin-top: 18px; }
-        .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
-        .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        .cart-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
+        .btn-order:hover { background: #128c7e; }
+        .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.95em; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; }
 
-        footer { text-align: center; padding: 25px; margin-top: 40px; color: #666; border-top: 1px solid #222; font-size: 0.85rem; }
+        footer { text-align: center; padding: 20px; margin-top: 40px; color: #666; border-top: 1px solid #222; }
 
+        @media (min-width: 768px) { body { font-size: 18px; } }
         @media (min-width: 1024px) { 
+            body { font-size: 20px; } 
             .main-container { flex-direction: row; }
         }
     </style>
@@ -246,7 +148,7 @@
     <header>
         <nav>
             <ul>
-                <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a href="#">Accueil</a></li>
                 <li><a href="#" id="cart-nav-btn">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
@@ -257,42 +159,11 @@
     <h1>NOTRE CATALOGUE</h1>
     <p class="subtitle">Revendeur officiel.</p>
 
-    <div class="category-filter-bar">
-        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Habits</button>
-        <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
-        <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
-        <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
-        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Montres</button>
-    </div>
-
     <div class="main-container">
         <div class="catalog-container">
-            
-            <section id="sec-habit" class="section-block active">
-                <h2 class="section-title">👕 Collection Habits</h2>
-                <div class="catalog-grid" id="grid-habit"></div>
-            </section>
-
-            <section id="sec-chaussure" class="section-block">
-                <h2 class="section-title">👟 Collection Chaussures</h2>
-                <div class="catalog-grid" id="grid-chaussure"></div>
-            </section>
-
-            <section id="sec-lunette" class="section-block">
-                <h2 class="section-title">🕶️ Collection Lunettes</h2>
-                <div class="catalog-grid" id="grid-lunette"></div>
-            </section>
-
-            <section id="sec-sac" class="section-block">
-                <h2 class="section-title">🎒 Collection Sacs</h2>
-                <div class="catalog-grid" id="grid-sac"></div>
-            </section>
-
-            <section id="sec-montre" class="section-block">
-                <h2 class="section-title">⌚ Collection Montres</h2>
-                <div class="catalog-grid" id="grid-montre"></div>
-            </section>
-
+            <div class="catalog-grid" id="catalog-products">
+                <p style="color: #fff; text-align: center; width: 100%;">Chargement du catalogue...</p>
+            </div>
         </div>
 
         <div id="cart-section" class="cart-container">
@@ -345,203 +216,198 @@
 
         window.MERCHANT_NUMBER = "2250720648060"; 
         window.cart = [];
-        window.allProducts = [];
+        window.productsData = [];
 
-        window.switchSection = function(catKey, btnElement) {
-            document.querySelectorAll('.section-block').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.btn-cat-filter').forEach(btn => btn.classList.remove('active'));
-            
-            const target = document.getElementById(`sec-${catKey}`);
-            if (target) target.classList.add('active');
-            if (btnElement) btnElement.classList.add('active');
-        };
-
+        // Synchronisation Firebase en temps réel
         const productsRef = ref(db, 'products');
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
-            window.allProducts = data ? Object.values(data).filter(p => p !== null) : [];
-            renderAllGrids();
+            if (data) {
+                // Filtrer pour ne garder que les produits valides (avec au moins un nom)
+                window.productsData = Object.entries(data)
+                    .map(([key, value]) => ({ key, ...value }))
+                    .filter(p => p.name && p.name.trim() !== "");
+                renderCatalog();
+            } else {
+                document.getElementById('catalog-products').innerHTML = `<p style="color: #fff; text-align: center; width: 100%;">Aucun produit disponible.</p>`;
+            }
         });
 
-        window.renderAllGrids = function() {
-            const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
+        window.renderCatalog = function() {
+            const catalogContainer = document.getElementById('catalog-products');
+            if (!catalogContainer) return;
+            catalogContainer.innerHTML = "";
 
-            sections.forEach(catKey => {
-                const container = document.getElementById(`grid-${catKey}`);
-                if (!container) return;
-                container.innerHTML = "";
+            if (window.productsData.length === 0) {
+                catalogContainer.innerHTML = `<p style="color: #fff; text-align: center; width: 100%;">Aucun produit disponible pour le moment.</p>`;
+                return;
+            }
 
-                let items = window.allProducts.filter(p => {
-                    const c = (p.category || p.section || '').toString().toLowerCase().trim();
-                    return c === catKey;
-                });
+            window.productsData.forEach(prod => {
+                const category = (prod.category || 'habit').toLowerCase();
+                const key = prod.key || prod.id;
+                const basePrice = parseInt(prod.price) || 0;
+                const safeName = prod.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const imageSrc = prod.image || 'https://via.placeholder.com/300?text=Pas+d+image';
+                const badgeText = prod.badge ? `<span class="badge-expert">${prod.badge}</span>` : '';
 
-                // Si pas de produits filtrés pour habit, prend tout le stock par défaut
-                if (catKey === 'habit' && items.length === 0) {
-                    items = window.allProducts;
+                let optionsHtml = '';
+                let defaultExtra = 0;
+
+                // Génération des options selon la catégorie
+                if (category === 'habit') {
+                    const sc = prod.suppCoton || 0;
+                    const sn = prod.suppNylon || 0;
+                    defaultExtra = prod.qualityType === "nylon" ? sn : sc;
+
+                    optionsHtml = `
+                        <div class="option-group">
+                            <label for="size-${key}">Taille :</label>
+                            <select id="size-${key}" class="option-select">
+                                <option value="S">S</option>
+                                <option value="M" selected>M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label for="quality-${key}">Matière / Qualité :</label>
+                            <select id="quality-${key}" class="option-select" onchange="adjustPrice('${key}', ${basePrice})">
+                                <option value="Coton" data-extra="${sc}" ${prod.qualityType !== 'nylon' ? 'selected' : ''}>Coton (+${sc} FCFA)</option>
+                                <option value="Nylon" data-extra="${sn}" ${prod.qualityType === 'nylon' ? 'selected' : ''}>Nylon (+${sn} FCFA)</option>
+                            </select>
+                        </div>`;
+                } else if (category === 'chaussure') {
+                    const sizes = (prod.sizes || '38,39,40,41,42,43,44,45').split(',');
+                    const suppSemelle = prod.suppSemelle || 0;
+                    
+                    let sizesOptions = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
+
+                    optionsHtml = `
+                        <div class="option-group">
+                            <label for="size-${key}">Pointure :</label>
+                            <select id="size-${key}" class="option-select">${sizesOptions}</select>
+                        </div>
+                        <div class="option-group">
+                            <label for="quality-${key}">Option Semelle :</label>
+                            <select id="quality-${key}" class="option-select" onchange="adjustPrice('${key}', ${basePrice})">
+                                <option value="Semelle Standard" data-extra="0" selected>Standard (+0 FCFA)</option>
+                                <option value="Semelle Orthopédique" data-extra="${suppSemelle}">Orthopédique (+${suppSemelle} FCFA)</option>
+                            </select>
+                        </div>`;
+                } else if (category === 'lunette') {
+                    const suppPolarise = prod.suppPolarise || 0;
+                    optionsHtml = `
+                        <div class="option-group">
+                            <label for="size-${key}">Monture :</label>
+                            <select id="size-${key}" class="option-select"><option value="Standard">${prod.frameMaterial || 'Acétate'}</option></select>
+                        </div>
+                        <div class="option-group">
+                            <label for="quality-${key}">Verres :</label>
+                            <select id="quality-${key}" class="option-select" onchange="adjustPrice('${key}', ${basePrice})">
+                                <option value="Verres Classiques" data-extra="0" selected>Classiques (+0 FCFA)</option>
+                                <option value="Verres Polarisés" data-extra="${suppPolarise}">Polarisés (+${suppPolarise} FCFA)</option>
+                            </select>
+                        </div>`;
+                } else if (category === 'sac') {
+                    const suppCuir = prod.suppCuir || 0;
+                    optionsHtml = `
+                        <div class="option-group">
+                            <label for="size-${key}">Matière :</label>
+                            <select id="size-${key}" class="option-select"><option value="Standard">${prod.bagMaterial || 'Cuir Synthétique'}</option></select>
+                        </div>
+                        <div class="option-group">
+                            <label for="quality-${key}">Finition :</label>
+                            <select id="quality-${key}" class="option-select" onchange="adjustPrice('${key}', ${basePrice})">
+                                <option value="Standard" data-extra="0" selected>Standard (+0 FCFA)</option>
+                                <option value="Cuir Véritable" data-extra="${suppCuir}">Cuir Véritable (+${suppCuir} FCFA)</option>
+                            </select>
+                        </div>`;
+                } else if (category === 'montre') {
+                    const suppAcier = prod.suppAcier || 0;
+                    optionsHtml = `
+                        <div class="option-group">
+                            <label for="size-${key}">Bracelet :</label>
+                            <select id="size-${key}" class="option-select"><option value="Standard">${prod.strapType || 'Cuir'}</option></select>
+                        </div>
+                        <div class="option-group">
+                            <label for="quality-${key}">Matériau :</label>
+                            <select id="quality-${key}" class="option-select" onchange="adjustPrice('${key}', ${basePrice})">
+                                <option value="Standard" data-extra="0" selected>Standard (+0 FCFA)</option>
+                                <option value="Acier Inoxydable" data-extra="${suppAcier}">Acier Inox (+${suppAcier} FCFA)</option>
+                            </select>
+                        </div>`;
                 }
 
-                const configSection = {
-                    habit: { brand: 'STREETWEAR', lbl1: 'Taille :', lbl2: 'Qualité :' },
-                    chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
-                    lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
-                    sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
-                    montre: { brand: 'MONTRES', lbl1: 'Cadran :', lbl2: 'Bracelet :' }
-                };
+                const finalPrice = basePrice + defaultExtra;
 
-                const config = configSection[catKey];
-
-                for (let i = 0; i < 30; i++) {
-                    const prod = items[i];
-
-                    // Définition des options HTML selon la catégorie (pour tous les conteneurs)
-                    let opt1Html = '';
-                    let opt2Html = '';
-                    let defaultExtra = 0;
-                    const basePrice = prod ? (prod.price || 0) : 15000;
-                    const prodId = prod ? prod.id : `${catKey}-demo-${i}`;
-                    const prodName = prod ? prod.name : `Emplacement N°${i+1}`;
-
-                    if (catKey === 'habit') {
-                        const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
-                        const sc = prod ? (prod.suppCoton || 0) : 0;
-                        const sn = prod ? (prod.suppNylon || 0) : 0;
-                        opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
-                        opt2Html = `
-                            <option value="Coton" data-extra="${sc}">Coton (+${sc} F)</option>
-                            <option value="Nylon" data-extra="${sn}">Nylon (+${sn} F)</option>
-                        `;
-                    } else if (catKey === 'chaussure') {
-                        const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['39', '40', '41', '42', '43', '44'];
-                        const suppSema = prod ? (prod.suppSemelle || 0) : 0;
-                        opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
-                        opt2Html = `
-                            <option value="Standard" data-extra="0">Standard (+0 F)</option>
-                            <option value="Orthopédique" data-extra="${suppSema}">Orthopédique (+${suppSema} F)</option>
-                        `;
-                    } else if (catKey === 'lunette') {
-                        const suppPola = prod ? (prod.suppPolarise || 0) : 0;
-                        opt1Html = `<option value="Unique">Unique</option>`;
-                        opt2Html = `
-                            <option value="UV400" data-extra="0">UV400 (+0 F)</option>
-                            <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
-                        `;
-                    } else if (catKey === 'sac') {
-                        const suppCuir = prod ? (prod.suppCuir || 0) : 0;
-                        opt1Html = `<option value="Standard">Standard</option><option value="Grand Format">Grand Format</option>`;
-                        opt2Html = `
-                            <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
-                            <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
-                        `;
-                    } else if (catKey === 'montre') {
-                        const suppAcier = prod ? (prod.suppAcier || 0) : 0;
-                        opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
-                        opt2Html = `
-                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
-                            <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
-                        `;
-                    }
-
-                    if (prod) {
-                        const safeName = prodName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-                        container.innerHTML += `
-                            <div class="product-card">
-                                <div class="image-container">
-                                    <span class="badge-expert">${prod.badge || 'Disponible'}</span>
-                                    <img src="${prod.image || 'https://via.placeholder.com/200'}" alt="${prodName}">
-                                </div>
-                                <div class="product-info">
-                                    <span class="brand">${(prod.category || config.brand).toUpperCase()}</span>
-                                    <div class="model-name">${prodName}</div>
-                                    <div class="price" id="display-price-${prodId}">${basePrice.toLocaleString()} FCFA</div>
-                                    <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
-                                    
-                                    <div class="options-container">
-                                        <div class="option-group">
-                                            <label for="size-${prodId}">${config.lbl1}</label>
-                                            <select id="size-${prodId}" class="option-select">${opt1Html}</select>
-                                        </div>
-                                        <div class="option-group">
-                                            <label for="quality-${prodId}">${config.lbl2}</label>
-                                            <select id="quality-${prodId}" class="option-select" onchange="adjustPrice('${prodId}', ${basePrice})">${opt2Html}</select>
-                                        </div>
-                                    </div>
-                                    <button class="btn-add" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER AU PANIER</button>
-                                </div>
+                catalogContainer.innerHTML += `
+                    <div class="product-card">
+                        <div class="image-container">
+                            ${badgeText}
+                            <img src="${imageSrc}" alt="${prod.name}" onerror="this.src='https://via.placeholder.com/300?text=Image+Non+Disponible'">
+                        </div>
+                        <div class="product-info">
+                            <span class="brand">${category}</span>
+                            <div class="model-name">${prod.name}</div>
+                            <div class="price" id="display-price-${key}">${finalPrice.toLocaleString()} FCFA</div>
+                            <div class="expert-note"><strong>Avis Revendeur :</strong> produit de qualité supérieure.</div>
+                            
+                            <div class="options-container">
+                                ${optionsHtml}
                             </div>
-                        `;
-                    } else {
-                        // Affiche les menus déroulants d'options même sur les cartes temporaires
-                        container.innerHTML += `
-                            <div class="product-card">
-                                <div class="image-container" style="background:#f0f0f0; color:#888; font-size:0.85rem; font-weight:bold;">
-                                    Grille #${i+1}
-                                </div>
-                                <div class="product-info">
-                                    <span class="brand">${config.brand}</span>
-                                    <div class="model-name">Emplacement N°${i+1}</div>
-                                    <div class="price" id="display-price-${prodId}">${basePrice.toLocaleString()} FCFA</div>
-                                    <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
-                                    
-                                    <div class="options-container">
-                                        <div class="option-group">
-                                            <label for="size-${prodId}">${config.lbl1}</label>
-                                            <select id="size-${prodId}" class="option-select">${opt1Html}</select>
-                                        </div>
-                                        <div class="option-group">
-                                            <label for="quality-${prodId}">${config.lbl2}</label>
-                                            <select id="quality-${prodId}" class="option-select" onchange="adjustPrice('${prodId}', ${basePrice})">${opt2Html}</select>
-                                        </div>
-                                    </div>
-                                    <button class="btn-add" onclick="prepareAddToCart('${prodId}', 'Emplacement N°${i+1}', ${basePrice})">AJOUTER AU PANIER</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
+                            <button class="btn-add" onclick="prepareAddToCart('${key}', '${safeName}', ${basePrice})">AJOUTER AU PANIER</button>
+                        </div>
+                    </div>
+                `;
             });
-        };
+        }
 
-        window.adjustPrice = function(productId, originalPrice) {
-            const qualityElement = document.getElementById(`quality-${productId}`);
-            if(!qualityElement) return;
-            const selectedOpt = qualityElement.options[qualityElement.selectedIndex];
-            const extra = parseInt(selectedOpt.getAttribute('data-extra')) || 0;
+        window.adjustPrice = function(key, originalPrice) {
+            const qualityElement = document.getElementById(`quality-${key}`);
+            const extra = parseInt(qualityElement.options[qualityElement.selectedIndex].getAttribute('data-extra')) || 0;
             const finalPrice = originalPrice + extra;
-            document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
-        };
+            document.getElementById(`display-price-${key}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
+        }
 
-        window.prepareAddToCart = function(productId, name, originalPrice) {
-            const sizeEl = document.getElementById(`size-${productId}`);
-            const qualityEl = document.getElementById(`quality-${productId}`);
-            
-            const size = sizeEl ? sizeEl.value : 'Unique';
+        window.prepareAddToCart = function(key, name, originalPrice) {
+            const sizeEl = document.getElementById(`size-${key}`);
+            const qualityEl = document.getElementById(`quality-${key}`);
+
+            const size = sizeEl ? sizeEl.value : 'Standard';
             const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
-            
+
             window.addToCart(name, originalPrice + extra, size, qualityLabel);
-        };
+        }
 
         window.addToCart = function(name, price, size, quality) {
             const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
-            if (existingItem) { existingItem.quantity += 1; } else { window.cart.push({ name, price, size, quality, quantity: 1 }); }
+            if (existingItem) { 
+                existingItem.quantity += 1; 
+            } else { 
+                window.cart.push({ name, price, size, quality, quantity: 1 }); 
+            }
             window.updateCartUI();
-        };
+        }
 
         window.removeFromCart = function(name, size, quality) {
             window.cart = window.cart.filter(item => !(item.name === name && item.size === size && item.quality === quality));
             window.updateCartUI();
-        };
+        }
 
-        window.clearCart = function() { window.cart = []; window.updateCartUI(); };
+        window.clearCart = function() { 
+            window.cart = []; 
+            window.updateCartUI(); 
+        }
 
         window.updateCartUI = function() {
             const cartItemsDiv = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const countSpan = document.getElementById('cart-count');
             const countNavSpan = document.getElementById('cart-count-nav');
-            let total = 0; let totalItems = 0;
+            let total = 0; 
+            let totalItems = 0;
 
             if (window.cart.length === 0) {
                 cartItemsDiv.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
@@ -561,7 +427,7 @@
                     <div class="cart-item">
                         <div>
                             <span>${item.name} (x${item.quantity})</span>
-                            <span class="cart-item-meta">Opt: ${item.size} | ${item.quality}</span>
+                            <span class="cart-item-meta">Option: ${item.size} | ${item.quality}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <strong>${(item.price * item.quantity).toLocaleString()} F</strong>
@@ -573,26 +439,28 @@
             cartTotal.innerText = total.toLocaleString();
             if(countSpan) countSpan.innerText = totalItems;
             if(countNavSpan) countNavSpan.innerText = totalItems;
-        };
+        }
 
         window.sendOrder = function() {
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
-            if (window.cart.length === 0 || !name || !phone || !delivery) return alert("Remplissez vos infos (Nom, Téléphone, Adresse) et votre panier.");
+            if (window.cart.length === 0 || !name || !phone || !delivery) return alert("Remplissez vos informations (Nom, Téléphone, Adresse) et ajoutez des produits au panier.");
 
             let message = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n👤 *Client :* ${name}\n📞 *Téléphone :* ${phone}\n📍 *Livraison :* ${delivery}\n\n📦 *Articles :*\n`;
             let total = 0;
             window.cart.forEach(item => {
-                const subtotal = item.price * item.quantity; total += subtotal;
-                message += `- ${item.name} (x${item.quantity}) | Options: ${item.size} - ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
+                const subtotal = item.price * item.quantity; 
+                total += subtotal;
+                message += `- ${item.name} (x${item.quantity}) | Option: ${item.size} | ${item.quality} -> *${subtotal.toLocaleString()} FCFA*\n`;
             });
             message += `\n💰 *Total à payer : ${total.toLocaleString()} FCFA*`;
             window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
-        };
+        }
 
         document.getElementById('cart-nav-btn').addEventListener('click', function(e) {
-            e.preventDefault(); document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
+            e.preventDefault(); 
+            document.getElementById('cart-section').scrollIntoView({ behavior: 'smooth' });
         });
     </script>
 </body>
