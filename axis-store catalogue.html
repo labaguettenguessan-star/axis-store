@@ -462,7 +462,7 @@
         </div>
         <div class="form-group">
             <label for="client-phone">Numéro de Téléphone :</label>
-            <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
+            <input type="tel" id="client-phone" placeholder="Ex: 0755555555">
         </div>
         <div class="form-group">
             <label for="delivery-zone">Zone de Livraison :</label>
@@ -652,7 +652,6 @@
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
                         opt2Html = `
-                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
                             <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
                         `;
                     }
