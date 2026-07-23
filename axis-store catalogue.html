@@ -644,11 +644,10 @@
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
                     } else if (catKey === 'montre') {
-                        const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         opt1Html = '';
                         opt2Html = `
-                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
-                            <option value="Acier Inoxydable" data-extra="${suppAcier}">Acier Inoxydable (+${suppAcier} F)</option>
+                            <option value="Cuir" data-extra="0">Cuir</option>
+                            <option value="Acier Inoxydable" data-extra="0">Acier Inoxydable</option>
                         `;
                     }
 
