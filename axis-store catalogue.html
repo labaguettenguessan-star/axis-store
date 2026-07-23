@@ -37,43 +37,17 @@
         nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
         nav a:hover { color: #39ff14; }
 
-        /* LOGO AXIS STORE AVEC SYMBOLE CHRÉTIEN */
+        /* LOGO AXIS STORE CLASSIQUE */
         .logo {
             font-size: 1.5rem;
             font-weight: 900;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 2px;
         }
 
-        .cross-x {
-            position: relative;
+        .logo span {
             color: #39ff14;
-            display: inline-block;
-            padding: 0 2px;
-            font-weight: 900;
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
-        }
-
-        .cross-x::after {
-            content: '';
-            position: absolute;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            height: 80%;
-            background-color: #39ff14;
-            box-shadow: 0 0 8px #39ff14;
-            border-radius: 2px;
-        }
-
-        .logo > span:last-child {
-            color: #39ff14;
-            margin-left: 5px;
         }
 
         h1 { text-align: center; color: #39ff14; margin-bottom: 5px; font-weight: 800; }
@@ -420,7 +394,7 @@
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
         </nav>
-        <div class="logo">A<span class="cross-x">X</span>IS <span>STORE</span></div>
+        <div class="logo">AXIS <span>STORE</span></div>
     </header>
 
     <h1>NOTRE CATALOGUE</h1>
@@ -530,7 +504,7 @@
         <p>&copy; 2026 AXIS STORE. QUALITÉ ASSURÉE. BY PANDOR AGENCY</p>
     </footer>
 
-    <script type="module">
+  <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -549,16 +523,13 @@
 
         window.MERCHANT_NUMBER = "2250720648060"; 
         
-        // RECUPERATION DU PANIER DEPUIS LOCALSTORAGE
         window.cart = JSON.parse(localStorage.getItem('axis_cart')) || [];
         window.allProducts = [];
 
-        // ENREGISTREMENT LOCALSTORAGE
         window.saveCart = function() {
             localStorage.setItem('axis_cart', JSON.stringify(window.cart));
         };
 
-        // NOTIFICATION TOAST
         window.showToast = function(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -570,7 +541,6 @@
             setTimeout(() => floatBtn.classList.remove('bounce-anim'), 800);
         };
 
-        // ZOOM IMAGE (LIGHTBOX)
         window.openLightbox = function(src) {
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').classList.add('active');
@@ -579,7 +549,6 @@
             document.getElementById('lightbox').classList.remove('active');
         };
 
-        // OUVERTURE / FERMETURE DU PANIER
         window.toggleCart = function() {
             const cartDrawer = document.getElementById('cart-section');
             const cartOverlay = document.getElementById('cart-overlay');
@@ -617,22 +586,32 @@
             updateCartUI();
         });
 
+        // Détection automatique du type de produit si la catégorie est incomplète
+        function detectCategory(prod, fallbackCat) {
+            const rawCat = (prod.category || prod.section || '').toString().toLowerCase().trim();
+            if (rawCat) return rawCat;
+
+            const name = (prod.name || '').toLowerCase();
+            if (name.includes('casio') || name.includes('montre') || name.includes('bracelet') || name.includes('edifice')) return 'montre';
+            if (name.includes('chaussure') || name.includes('nike') || name.includes('adidas') || name.includes('sneaker')) return 'chaussure';
+            if (name.includes('lunette') || name.includes('soleil')) return 'lunette';
+            if (name.includes('sac') || name.includes('pochette')) return 'sac';
+
+            return fallbackCat;
+        }
+
         window.renderAllGrids = function() {
             const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
 
-            sections.forEach(catKey => {
-                const container = document.getElementById(`grid-${catKey}`);
+            sections.forEach(secKey => {
+                const container = document.getElementById(`grid-${secKey}`);
                 if (!container) return;
                 container.innerHTML = "";
 
                 let items = window.allProducts.filter(p => {
-                    const c = (p.category || p.section || '').toString().toLowerCase().trim();
-                    return c === catKey;
+                    const actualCat = detectCategory(p, 'habit');
+                    return actualCat === secKey;
                 });
-
-                if (catKey === 'habit' && items.length === 0) {
-                    items = window.allProducts.filter(p => !p.category || p.category === 'habit');
-                }
 
                 const configSection = {
                     habit: { brand: 'VÊTEMENTS', lbl1: 'Taille :', lbl2: 'Qualité :' },
@@ -642,8 +621,8 @@
                     montre: { brand: 'ACCESSOIRES / MONTRES', lbl1: 'Cadran / Taille :', lbl2: 'Matière / Bracelet :' }
                 };
 
-                const config = configSection[catKey];
-                const displayCount = items.length > 0 ? Math.min(items.length, 40) : 12;
+                const config = configSection[secKey];
+                const displayCount = items.length > 0 ? items.length : 0;
 
                 for (let i = 0; i < displayCount; i++) {
                     const prod = items[i];
@@ -651,10 +630,10 @@
                     let opt1Html = '';
                     let opt2Html = '';
                     const basePrice = prod ? (parseInt(prod.price) || 0) : 15000;
-                    const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
+                    const prodId = prod ? (prod.id || `${secKey}-${i}`) : `${secKey}-demo-${i}`;
                     const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
 
-                    if (catKey === 'habit') {
+                    if (secKey === 'habit') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
                         const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
                         const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
@@ -663,7 +642,7 @@
                             <option value="Coton" data-extra="${sc}">Coton (+${sc} F)</option>
                             <option value="Nylon" data-extra="${sn}">Nylon (+${sn} F)</option>
                         `;
-                    } else if (catKey === 'chaussure') {
+                    } else if (secKey === 'chaussure') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['39', '40', '41', '42', '43', '44'];
                         const suppSema = prod ? (parseInt(prod.suppSemelle) || 0) : 0;
                         opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
@@ -671,27 +650,27 @@
                             <option value="Standard" data-extra="0">Standard (+0 F)</option>
                             <option value="Orthopédique" data-extra="${suppSema}">Orthopédique (+${suppSema} F)</option>
                         `;
-                    } else if (catKey === 'lunette') {
+                    } else if (secKey === 'lunette') {
                         const suppPola = prod ? (parseInt(prod.suppPolarise) || 0) : 0;
                         opt1Html = `<option value="Taille Unique">Taille Unique</option>`;
                         opt2Html = `
                             <option value="UV400" data-extra="0">UV400 (+0 F)</option>
                             <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
                         `;
-                    } else if (catKey === 'sac') {
+                    } else if (secKey === 'sac') {
                         const suppCuir = prod ? (parseInt(prod.suppCuir) || 0) : 0;
                         opt1Html = `<option value="Standard">Standard</option><option value="Grand Format">Grand Format</option>`;
                         opt2Html = `
                             <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
-                    } else if (catKey === 'montre') {
+                    } else if (secKey === 'montre') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
                         const cadrans = (prod && prod.sizes) ? prod.sizes.split(',') : ['Taille Unique', '40mm', '44mm'];
                         opt1Html = cadrans.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
                         opt2Html = `
-                            <option value="Cuir / Standard" data-extra="0">Cuir / Standard (+0 F)</option>
                             <option value="Acier Inox / Premium" data-extra="${suppAcier}">Acier Inox / Premium (+${suppAcier} F)</option>
+                            <option value="Cuir / Standard" data-extra="0">Cuir / Standard (+0 F)</option>
                         `;
                     }
 
@@ -706,7 +685,7 @@
                                 <img src="${displayImg}" alt="${safeName}">
                             </div>
                             <div class="product-info">
-                                <span class="brand">${(prod && prod.category ? prod.category : config.brand).toUpperCase()}</span>
+                                <span class="brand">${config.brand}</span>
                                 <div class="model-name">${prodName}</div>
                                 <div class="price" id="display-price-${prodId}">${basePrice.toLocaleString()} FCFA</div>
                                 <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
@@ -722,7 +701,7 @@
                                     </div>
                                 </div>
                                 <div class="action-buttons">
-                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice}, '${catKey}')">AJOUTER</button>
+                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice}, '${secKey}')">AJOUTER</button>
                                 </div>
                             </div>
                         </div>
@@ -748,12 +727,21 @@
             let qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
             
+            let formattedSize = size;
+            let formattedQuality = qualityLabel;
+
             if (catKey === 'montre') {
-                size = `Cadran: ${size}`;
-                qualityLabel = `Matière: ${qualityLabel}`;
+                formattedSize = `Cadran: ${size}`;
+                formattedQuality = `Matière: ${qualityLabel}`;
+            } else if (catKey === 'habit') {
+                formattedSize = `Taille: ${size}`;
+                formattedQuality = `Matière: ${qualityLabel}`;
+            } else if (catKey === 'chaussure') {
+                formattedSize = `Pointure: ${size}`;
+                formattedQuality = `Semelle: ${qualityLabel}`;
             }
 
-            window.addToCart(name, originalPrice + extra, size, qualityLabel);
+            window.addToCart(name, originalPrice + extra, formattedSize, formattedQuality);
 
             const btn = document.getElementById(`btn-add-${productId}`);
             if(btn) {
@@ -799,49 +787,49 @@
         };
 
         window.updateCartUI = function() {
-            const cartItemsEl = document.getElementById('cart-items');
+            const cartItemsContainer = document.getElementById('cart-items');
             const cartTotalEl = document.getElementById('cart-total');
             const cartCountEl = document.getElementById('cart-count');
-            const cartCountNav = document.getElementById('cart-count-nav');
             const cartCountFloat = document.getElementById('cart-count-float');
+            const cartCountNav = document.getElementById('cart-count-nav');
+            const deliveryZone = parseInt(document.getElementById('delivery-zone').value) || 0;
 
-            if (!cartItemsEl) return;
+            let totalItems = 0;
+            let subtotal = 0;
 
-            let total = 0;
-            let count = 0;
+            cartItemsContainer.innerHTML = '';
 
             if (window.cart.length === 0) {
-                cartItemsEl.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
+                cartItemsContainer.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
             } else {
-                cartItemsEl.innerHTML = window.cart.map((item, idx) => {
+                window.cart.forEach((item, index) => {
+                    totalItems += item.quantity;
                     const itemTotal = item.price * item.quantity;
-                    total += itemTotal;
-                    count += item.quantity;
+                    subtotal += itemTotal;
 
-                    return `
+                    cartItemsContainer.innerHTML += `
                         <div class="cart-item">
                             <div>
                                 <strong>${item.name}</strong>
                                 <span class="cart-item-meta">${item.size} | ${item.quality}</span>
-                                <div>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></div>
+                                <span>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></span>
                             </div>
                             <div class="qty-controls">
-                                <button class="qty-btn" onclick="changeQty(${idx}, -1)">-</button>
+                                <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
                                 <span>${item.quantity}</span>
-                                <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+                                <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
                             </div>
                         </div>
                     `;
-                }).join('');
+                });
             }
 
-            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || "0");
-            const finalTotal = total + (window.cart.length > 0 ? deliveryFee : 0);
+            const total = subtotal + (window.cart.length > 0 ? deliveryZone : 0);
 
-            cartTotalEl.innerText = finalTotal.toLocaleString();
-            cartCountEl.innerText = count;
-            if(cartCountNav) cartCountNav.innerText = count;
-            if(cartCountFloat) cartCountFloat.innerText = count;
+            cartTotalEl.innerText = total.toLocaleString();
+            cartCountEl.innerText = totalItems;
+            cartCountFloat.innerText = totalItems;
+            cartCountNav.innerText = totalItems;
         };
 
         window.sendOrder = function() {
@@ -853,39 +841,41 @@
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
+            const deliveryZoneSelect = document.getElementById('delivery-zone');
+            const deliveryZoneText = deliveryZoneSelect.options[deliveryZoneSelect.selectedIndex].text;
+            const deliveryCost = parseInt(deliveryZoneSelect.value) || 0;
             const payment = document.getElementById('payment-method').value;
-            const deliveryFee = parseInt(document.getElementById('delivery-zone').value || "0");
 
             if (!name || !phone || !delivery) {
-                alert("Veuillez remplir votre nom, téléphone et adresse de livraison.");
+                alert("Veuillez remplir vos informations (Nom, Téléphone et Adresse) pour valider la commande.");
                 return;
             }
 
-            let summary = `🛍️ *NOUVELLE COMMANDE AXIS STORE*\n\n`;
-            summary += `👤 *Client :* ${name}\n`;
-            summary += `📞 *Tél :* ${phone}\n`;
-            summary += `📍 *Livraison :* ${delivery}\n`;
-            summary += `💳 *Paiement :* ${payment}\n\n`;
-            summary += `📦 *ARTICLES :*\n`;
+            let message = `🛒 *NOUVELLE COMMANDE - AXIS STORE*\n\n`;
+            message += `👤 *Client :* ${name}\n`;
+            message += `📞 *Téléphone :* ${phone}\n`;
+            message += `📍 *Lieu de livraison :* ${delivery}\n`;
+            message += `🚚 *Zone :* ${deliveryZoneText}\n`;
+            message += `💳 *Paiement :* ${payment}\n\n`;
+            message += `📦 *DÉTAILS DU PANIER :*\n`;
 
             let subtotal = 0;
             window.cart.forEach((item, i) => {
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
-                summary += `${i+1}. *${item.name}* (${item.size} / ${item.quality})\n   Qty: ${item.quantity} x ${item.price.toLocaleString()} F = ${itemTotal.toLocaleString()} FCFA\n`;
+                message += `${i + 1}. *${item.name}*\n   • Option: ${item.size} | ${item.quality}\n   • Qté: ${item.quantity} x ${item.price.toLocaleString()} FCFA = ${itemTotal.toLocaleString()} FCFA\n`;
             });
 
-            const grandTotal = subtotal + deliveryFee;
+            const total = subtotal + deliveryCost;
 
-            summary += `\n💵 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
-            summary += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
-            summary += `💰 *TOTAL À PAYER : ${grandTotal.toLocaleString()} FCFA*\n`;
+            message += `\n💰 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
+            if (deliveryCost > 0) {
+                message += `🚚 *Frais de livraison :* ${deliveryCost.toLocaleString()} FCFA\n`;
+            }
+            message += `🔥 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\n`;
+            message += `Merci d'avance pour la confirmation de ma commande !`;
 
-            const encodedMessage = encodeURIComponent(summary);
-            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`;
-
-            window.open(whatsappUrl, '_blank');
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`, '_blank');
         };
     </script>
-</body>
-</html>
