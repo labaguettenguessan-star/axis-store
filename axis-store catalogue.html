@@ -36,19 +36,8 @@
         nav ul { display: flex; list-style: none; gap: 25px; }
         nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
         nav a:hover { color: #39ff14; }
-
-        /* LOGO AXIS STORE CLASSIQUE */
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #ffffff;
-        }
-
-        .logo span {
-            color: #39ff14;
-        }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
+        .logo span { color: #39ff14; }
 
         h1 { text-align: center; color: #39ff14; margin-bottom: 5px; font-weight: 800; }
         .subtitle { text-align: center; color: #888; margin-bottom: 25px; }
@@ -210,11 +199,12 @@
 
         .action-buttons {
             display: flex;
+            gap: 8px;
             margin-top: 10px;
         }
 
         .btn-add { 
-            width: 100%;
+            flex: 1;
             text-align: center; 
             background: #000000; 
             color: #ffffff; 
@@ -222,12 +212,31 @@
             padding: 12px 8px; 
             border-radius: 6px; 
             font-weight: 800; 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             cursor: pointer; 
             transition: background 0.2s; 
             letter-spacing: 0.5px;
         }
         .btn-add:hover { background: #39ff14; color: #000000; }
+
+        .btn-buy-now {
+            flex: 1;
+            text-align: center;
+            background: #25D366;
+            color: #ffffff;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 6px;
+            font-weight: 800; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-buy-now:hover { background: #1eb855; }
 
         /* BOUTON PANIER FLOTTANT */
         .cart-toggle-btn {
@@ -401,18 +410,18 @@
     <p class="subtitle">Revendeur officiel.</p>
 
     <div class="category-filter-bar">
-        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Vêtements</button>
+        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Habits</button>
         <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
         <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
         <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
-        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Accessoires</button>
+        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Montres</button>
     </div>
 
     <div class="main-container">
         <div class="catalog-container">
             
             <section id="sec-habit" class="section-block active">
-                <h2 class="section-title">👕 Collection Vêtements</h2>
+                <h2 class="section-title">👕 Collection Habits</h2>
                 <div class="catalog-grid" id="grid-habit"></div>
             </section>
 
@@ -432,7 +441,7 @@
             </section>
 
             <section id="sec-montre" class="section-block">
-                <h2 class="section-title">⌚ Collection Accessoires</h2>
+                <h2 class="section-title">⌚ Collection Montres</h2>
                 <div class="catalog-grid" id="grid-montre"></div>
             </section>
 
@@ -477,6 +486,7 @@
         </div>
         <div class="form-group">
             <label for="delivery-zone">Zone de Livraison :</label>
+            <!-- SELECTION TARIFS DE LIVRAISON SANS TOULOUSE -->
             <select id="delivery-zone" onchange="updateCartUI()">
                 <option value="950">Abidjan (950 F)</option>
                 <option value="0">Hors Abidjan / Intérieur du pays (À convenir avec le livreur)</option>
@@ -504,7 +514,7 @@
         <p>&copy; 2026 AXIS STORE. QUALITÉ ASSURÉE. BY PANDOR AGENCY</p>
     </footer>
 
-  <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -523,13 +533,16 @@
 
         window.MERCHANT_NUMBER = "2250720648060"; 
         
+        // RECUPERATION DU PANIER DEPUIS LOCALSTORAGE
         window.cart = JSON.parse(localStorage.getItem('axis_cart')) || [];
         window.allProducts = [];
 
+        // ENREGISTREMENT LOCALSTORAGE
         window.saveCart = function() {
             localStorage.setItem('axis_cart', JSON.stringify(window.cart));
         };
 
+        // NOTIFICATION TOAST
         window.showToast = function(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -541,6 +554,7 @@
             setTimeout(() => floatBtn.classList.remove('bounce-anim'), 800);
         };
 
+        // ZOOM IMAGE (LIGHTBOX)
         window.openLightbox = function(src) {
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').classList.add('active');
@@ -549,6 +563,7 @@
             document.getElementById('lightbox').classList.remove('active');
         };
 
+        // OUVERTURE / FERMETURE DU PANIER
         window.toggleCart = function() {
             const cartDrawer = document.getElementById('cart-section');
             const cartOverlay = document.getElementById('cart-overlay');
@@ -586,43 +601,33 @@
             updateCartUI();
         });
 
-        // Détection automatique du type de produit si la catégorie est incomplète
-        function detectCategory(prod, fallbackCat) {
-            const rawCat = (prod.category || prod.section || '').toString().toLowerCase().trim();
-            if (rawCat) return rawCat;
-
-            const name = (prod.name || '').toLowerCase();
-            if (name.includes('casio') || name.includes('montre') || name.includes('bracelet') || name.includes('edifice')) return 'montre';
-            if (name.includes('chaussure') || name.includes('nike') || name.includes('adidas') || name.includes('sneaker')) return 'chaussure';
-            if (name.includes('lunette') || name.includes('soleil')) return 'lunette';
-            if (name.includes('sac') || name.includes('pochette')) return 'sac';
-
-            return fallbackCat;
-        }
-
         window.renderAllGrids = function() {
             const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
 
-            sections.forEach(secKey => {
-                const container = document.getElementById(`grid-${secKey}`);
+            sections.forEach(catKey => {
+                const container = document.getElementById(`grid-${catKey}`);
                 if (!container) return;
                 container.innerHTML = "";
 
                 let items = window.allProducts.filter(p => {
-                    const actualCat = detectCategory(p, 'habit');
-                    return actualCat === secKey;
+                    const c = (p.category || p.section || '').toString().toLowerCase().trim();
+                    return c === catKey;
                 });
 
+                if (catKey === 'habit' && items.length === 0) {
+                    items = window.allProducts;
+                }
+
                 const configSection = {
-                    habit: { brand: 'VÊTEMENTS', lbl1: 'Taille :', lbl2: 'Qualité :' },
+                    habit: { brand: 'STREETWEAR', lbl1: 'Taille :', lbl2: 'Qualité :' },
                     chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
                     lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
                     sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
-                    montre: { brand: 'ACCESSOIRES / MONTRES', lbl1: 'Cadran / Taille :', lbl2: 'Matière / Bracelet :' }
+                    montre: { brand: 'MONTRES', lbl1: 'Cadran :', lbl2: 'Bracelet :' }
                 };
 
-                const config = configSection[secKey];
-                const displayCount = items.length > 0 ? items.length : 0;
+                const config = configSection[catKey];
+                const displayCount = items.length > 0 ? items.length : 12;
 
                 for (let i = 0; i < displayCount; i++) {
                     const prod = items[i];
@@ -630,10 +635,10 @@
                     let opt1Html = '';
                     let opt2Html = '';
                     const basePrice = prod ? (parseInt(prod.price) || 0) : 15000;
-                    const prodId = prod ? (prod.id || `${secKey}-${i}`) : `${secKey}-demo-${i}`;
+                    const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
                     const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
 
-                    if (secKey === 'habit') {
+                    if (catKey === 'habit') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
                         const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
                         const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
@@ -642,7 +647,7 @@
                             <option value="Coton" data-extra="${sc}">Coton (+${sc} F)</option>
                             <option value="Nylon" data-extra="${sn}">Nylon (+${sn} F)</option>
                         `;
-                    } else if (secKey === 'chaussure') {
+                    } else if (catKey === 'chaussure') {
                         const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['39', '40', '41', '42', '43', '44'];
                         const suppSema = prod ? (parseInt(prod.suppSemelle) || 0) : 0;
                         opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
@@ -650,27 +655,26 @@
                             <option value="Standard" data-extra="0">Standard (+0 F)</option>
                             <option value="Orthopédique" data-extra="${suppSema}">Orthopédique (+${suppSema} F)</option>
                         `;
-                    } else if (secKey === 'lunette') {
+                    } else if (catKey === 'lunette') {
                         const suppPola = prod ? (parseInt(prod.suppPolarise) || 0) : 0;
-                        opt1Html = `<option value="Taille Unique">Taille Unique</option>`;
+                        opt1Html = `<option value="Unique">Unique</option>`;
                         opt2Html = `
                             <option value="UV400" data-extra="0">UV400 (+0 F)</option>
                             <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
                         `;
-                    } else if (secKey === 'sac') {
+                    } else if (catKey === 'sac') {
                         const suppCuir = prod ? (parseInt(prod.suppCuir) || 0) : 0;
                         opt1Html = `<option value="Standard">Standard</option><option value="Grand Format">Grand Format</option>`;
                         opt2Html = `
                             <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
                             <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
                         `;
-                    } else if (secKey === 'montre') {
+                    } else if (catKey === 'montre') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
-                        const cadrans = (prod && prod.sizes) ? prod.sizes.split(',') : ['Taille Unique', '40mm', '44mm'];
-                        opt1Html = cadrans.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
+                        opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
                         opt2Html = `
-                            <option value="Acier Inox / Premium" data-extra="${suppAcier}">Acier Inox / Premium (+${suppAcier} F)</option>
-                            <option value="Cuir / Standard" data-extra="0">Cuir / Standard (+0 F)</option>
+                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
+                            <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
                         `;
                     }
 
@@ -685,7 +689,7 @@
                                 <img src="${displayImg}" alt="${safeName}">
                             </div>
                             <div class="product-info">
-                                <span class="brand">${config.brand}</span>
+                                <span class="brand">${(prod && prod.category ? prod.category : config.brand).toUpperCase()}</span>
                                 <div class="model-name">${prodName}</div>
                                 <div class="price" id="display-price-${prodId}">${basePrice.toLocaleString()} FCFA</div>
                                 <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
@@ -701,7 +705,8 @@
                                     </div>
                                 </div>
                                 <div class="action-buttons">
-                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice}, '${secKey}')">AJOUTER</button>
+                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER</button>
+                                    <button class="btn-buy-now" onclick="buyNowDirect('${prodId}', '${safeName}', ${basePrice})">ACHAT DIRECT</button>
                                 </div>
                             </div>
                         </div>
@@ -719,30 +724,17 @@
             document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
         };
 
-        window.prepareAddToCart = function(productId, name, originalPrice, catKey) {
+        window.prepareAddToCart = function(productId, name, originalPrice) {
             const sizeEl = document.getElementById(`size-${productId}`);
             const qualityEl = document.getElementById(`quality-${productId}`);
             
-            let size = sizeEl ? sizeEl.value : 'Unique';
-            let qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
+            const size = sizeEl ? sizeEl.value : 'Unique';
+            const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
             
-            let formattedSize = size;
-            let formattedQuality = qualityLabel;
+            window.addToCart(name, originalPrice + extra, size, qualityLabel);
 
-            if (catKey === 'montre') {
-                formattedSize = `Cadran: ${size}`;
-                formattedQuality = `Matière: ${qualityLabel}`;
-            } else if (catKey === 'habit') {
-                formattedSize = `Taille: ${size}`;
-                formattedQuality = `Matière: ${qualityLabel}`;
-            } else if (catKey === 'chaussure') {
-                formattedSize = `Pointure: ${size}`;
-                formattedQuality = `Semelle: ${qualityLabel}`;
-            }
-
-            window.addToCart(name, originalPrice + extra, formattedSize, formattedQuality);
-
+            // Animation visuelle du bouton
             const btn = document.getElementById(`btn-add-${productId}`);
             if(btn) {
                 const origText = btn.innerText;
@@ -769,50 +761,47 @@
             window.showToast("Produit ajouté au panier !");
         };
 
-        window.changeQty = function(index, delta) {
-            if (window.cart[index]) {
-                window.cart[index].quantity += delta;
-                if (window.cart[index].quantity <= 0) {
-                    window.cart.splice(index, 1);
-                }
-                window.saveCart();
-                window.updateCartUI();
-            }
+        // ACHAT DIRECT SANS PASSER PAR LE PANIER
+        window.buyNowDirect = function(productId, name, originalPrice) {
+            const sizeEl = document.getElementById(`size-${productId}`);
+            const qualityEl = document.getElementById(`quality-${productId}`);
+            
+            const size = sizeEl ? sizeEl.value : 'Unique';
+            const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
+            const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
+            const totalPrice = originalPrice + extra;
+
+            const message = `👋 Bonjour AXIS STORE !\nJe souhaite acheter directement ce produit :\n\n📌 *Produit :* ${name}\n📐 *Options :* ${size} | ${qualityLabel}\n💰 *Prix :* ${totalPrice.toLocaleString()} FCFA\n\nMerci de me donner la procédure de livraison !`;
+
+            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
         };
 
-        window.clearCart = function() {
-            window.cart = [];
-            window.saveCart();
-            window.updateCartUI();
-        };
-
+        // MISE À JOUR DE L'INTERFACE PANIER ET CALCUL DU TOTAL
         window.updateCartUI = function() {
             const cartItemsContainer = document.getElementById('cart-items');
-            const cartTotalEl = document.getElementById('cart-total');
-            const cartCountEl = document.getElementById('cart-count');
-            const cartCountFloat = document.getElementById('cart-count-float');
             const cartCountNav = document.getElementById('cart-count-nav');
-            const deliveryZone = parseInt(document.getElementById('delivery-zone').value) || 0;
+            const cartCountFloat = document.getElementById('cart-count-float');
+            const cartCountHeader = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+            const deliveryZone = document.getElementById('delivery-zone');
 
             let totalItems = 0;
             let subtotal = 0;
 
-            cartItemsContainer.innerHTML = '';
-
             if (window.cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
+                cartItemsContainer.innerHTML = `<p style="color: #888; font-style: italic;">Votre panier est vide.</p>`;
             } else {
+                cartItemsContainer.innerHTML = '';
                 window.cart.forEach((item, index) => {
                     totalItems += item.quantity;
-                    const itemTotal = item.price * item.quantity;
-                    subtotal += itemTotal;
+                    subtotal += item.price * item.quantity;
 
                     cartItemsContainer.innerHTML += `
                         <div class="cart-item">
                             <div>
                                 <strong>${item.name}</strong>
-                                <span class="cart-item-meta">${item.size} | ${item.quality}</span>
-                                <span>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></span>
+                                <span class="cart-item-meta">Taille: ${item.size} | Option: ${item.quality}</span>
+                                <span class="cart-item-meta">${item.price.toLocaleString()} FCFA x ${item.quantity}</span>
                             </div>
                             <div class="qty-controls">
                                 <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
@@ -824,14 +813,35 @@
                 });
             }
 
-            const total = subtotal + (window.cart.length > 0 ? deliveryZone : 0);
+            const deliveryFee = parseInt(deliveryZone ? deliveryZone.value : 0) || 0;
+            const finalTotal = subtotal > 0 ? (subtotal + deliveryFee) : 0;
 
-            cartTotalEl.innerText = total.toLocaleString();
-            cartCountEl.innerText = totalItems;
-            cartCountFloat.innerText = totalItems;
-            cartCountNav.innerText = totalItems;
+            if (cartCountNav) cartCountNav.innerText = totalItems;
+            if (cartCountFloat) cartCountFloat.innerText = totalItems;
+            if (cartCountHeader) cartCountHeader.innerText = totalItems;
+            if (cartTotal) cartTotal.innerText = finalTotal.toLocaleString();
         };
 
+        // MODIFIER LA QUANTITÉ
+        window.changeQty = function(index, delta) {
+            if (window.cart[index]) {
+                window.cart[index].quantity += delta;
+                if (window.cart[index].quantity <= 0) {
+                    window.cart.splice(index, 1);
+                }
+                window.saveCart();
+                window.updateCartUI();
+            }
+        };
+
+        // VIDER LE PANIER
+        window.clearCart = function() {
+            window.cart = [];
+            window.saveCart();
+            window.updateCartUI();
+        };
+
+        // ENVOYER LA COMMANDE VIA WHATSAPP
         window.sendOrder = function() {
             if (window.cart.length === 0) {
                 alert("Votre panier est vide !");
@@ -840,42 +850,39 @@
 
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
-            const delivery = document.getElementById('client-delivery').value.trim();
-            const deliveryZoneSelect = document.getElementById('delivery-zone');
-            const deliveryZoneText = deliveryZoneSelect.options[deliveryZoneSelect.selectedIndex].text;
-            const deliveryCost = parseInt(deliveryZoneSelect.value) || 0;
-            const payment = document.getElementById('payment-method').value;
+            const deliveryZoneEl = document.getElementById('delivery-zone');
+            const deliveryText = deliveryZoneEl.options[deliveryZoneEl.selectedIndex].text;
+            const deliveryFee = parseInt(deliveryZoneEl.value) || 0;
+            const deliveryAddress = document.getElementById('client-delivery').value.trim();
+            const paymentMethod = document.getElementById('payment-method').value;
 
-            if (!name || !phone || !delivery) {
-                alert("Veuillez remplir vos informations (Nom, Téléphone et Adresse) pour valider la commande.");
+            if (!name || !phone || !deliveryAddress) {
+                alert("Veuillez remplir votre Nom, Téléphone et Adresse de livraison !");
                 return;
             }
 
-            let message = `🛒 *NOUVELLE COMMANDE - AXIS STORE*\n\n`;
-            message += `👤 *Client :* ${name}\n`;
-            message += `📞 *Téléphone :* ${phone}\n`;
-            message += `📍 *Lieu de livraison :* ${delivery}\n`;
-            message += `🚚 *Zone :* ${deliveryZoneText}\n`;
-            message += `💳 *Paiement :* ${payment}\n\n`;
-            message += `📦 *DÉTAILS DU PANIER :*\n`;
+            let summary = `🛍️ *NOUVELLE COMMANDE AXIS STORE*\n\n`;
+            summary += `👤 *Nom :* ${name}\n`;
+            summary += `📞 *Téléphone :* ${phone}\n`;
+            summary += `📍 *Zone :* ${deliveryText}\n`;
+            summary += `🏠 *Adresse :* ${deliveryAddress}\n`;
+            summary += `💳 *Paiement :* ${paymentMethod}\n\n`;
+            summary += `📦 *PRODUITS COMMANDÉS :*\n`;
 
             let subtotal = 0;
             window.cart.forEach((item, i) => {
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
-                message += `${i + 1}. *${item.name}*\n   • Option: ${item.size} | ${item.quality}\n   • Qté: ${item.quantity} x ${item.price.toLocaleString()} FCFA = ${itemTotal.toLocaleString()} FCFA\n`;
+                summary += `${i + 1}. ${item.name} (${item.size} - ${item.quality})\n   👉 Quantité: ${item.quantity} | Prix: ${itemTotal.toLocaleString()} FCFA\n`;
             });
 
-            const total = subtotal + deliveryCost;
+            const total = subtotal + deliveryFee;
+            summary += `\n💰 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
+            summary += `🚚 *Livraison :* ${deliveryFee > 0 ? deliveryFee.toLocaleString() + ' FCFA' : 'À convenir avec le livreur'}\n`;
+            summary += `🔥 *TOTAL À PAYER : ${total.toLocaleString()} FCFA*`;
 
-            message += `\n💰 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
-            if (deliveryCost > 0) {
-                message += `🚚 *Frais de livraison :* ${deliveryCost.toLocaleString()} FCFA\n`;
-            }
-            message += `🔥 *TOTAL À PAYER :* ${total.toLocaleString()} FCFA\n\n`;
-            message += `Merci d'avance pour la confirmation de ma commande !`;
-
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`, '_blank');
+            window.open(`https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(summary)}`, '_blank');
         };
     </script>
+</body>
+</html>
