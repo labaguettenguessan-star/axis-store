@@ -50,11 +50,9 @@
             <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
         </div>
 
-        <!-- 1. SECTION HABITS (1 à 30) -->
+        <!-- 1. HABITS -->
         <div class="section-block">
-            <div class="section-header">
-                <h2 class="section-title">👕 SECTION HABITS (GRILLE 1 À 30)</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title">👕 SECTION HABITS (GRILLE 1 À 30)</h2></div>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -75,11 +73,9 @@
             <button class="btn-save-section" onclick="saveSection('habit')">💾 Enregistrer la section Habits</button>
         </div>
 
-        <!-- 2. SECTION CHAUSSURES (1 à 30) -->
+        <!-- 2. CHAUSSURES -->
         <div class="section-block">
-            <div class="section-header">
-                <h2 class="section-title">👟 SECTION CHAUSSURES (GRILLE 1 À 30)</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title">👟 SECTION CHAUSSURES (GRILLE 1 À 30)</h2></div>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -100,11 +96,9 @@
             <button class="btn-save-section" onclick="saveSection('chaussure')">💾 Enregistrer la section Chaussures</button>
         </div>
 
-        <!-- 3. SECTION LUNETTES (1 à 30) -->
+        <!-- 3. LUNETTES -->
         <div class="section-block">
-            <div class="section-header">
-                <h2 class="section-title">🕶️ SECTION LUNETTES (GRILLE 1 À 30)</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title">🕶️ SECTION LUNETTES (GRILLE 1 À 30)</h2></div>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -125,11 +119,9 @@
             <button class="btn-save-section" onclick="saveSection('lunette')">💾 Enregistrer la section Lunettes</button>
         </div>
 
-        <!-- 4. SECTION SACS (1 à 30) -->
+        <!-- 4. SACS -->
         <div class="section-block">
-            <div class="section-header">
-                <h2 class="section-title">🎒 SECTION SACS (GRILLE 1 À 30)</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title">🎒 SECTION SACS (GRILLE 1 À 30)</h2></div>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -150,11 +142,9 @@
             <button class="btn-save-section" onclick="saveSection('sac')">💾 Enregistrer la section Sacs</button>
         </div>
 
-        <!-- 5. SECTION MONTRES (1 à 30) -->
+        <!-- 5. MONTRES -->
         <div class="section-block">
-            <div class="section-header">
-                <h2 class="section-title">⌚ SECTION MONTRES (GRILLE 1 À 30)</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title">⌚ SECTION MONTRES (GRILLE 1 À 30)</h2></div>
             <div style="overflow-x: auto;">
                 <table class="admin-table">
                     <thead>
@@ -174,7 +164,6 @@
             </div>
             <button class="btn-save-section" onclick="saveSection('montre')">💾 Enregistrer la section Montres</button>
         </div>
-
     </div>
 
     <script type="module">
@@ -219,15 +208,13 @@
 
         function loadDatabase() {
             onValue(ref(db, 'products'), (snapshot) => {
-                const data = snapshot.val() || {};
-                window.productsData = data;
+                window.productsData = snapshot.val() || {};
                 renderAllTables();
             });
         }
 
         function renderAllTables() {
             const categories = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
-
             const existingItemsByCat = {};
             categories.forEach(cat => { existingItemsByCat[cat] = []; });
 
@@ -250,9 +237,8 @@
 
                 for (let i = 1; i <= 30; i++) {
                     const fixedKey = `${cat}_${i}`;
-                    const prod = catList.find(p => p.id === i || p.dbKey === fixedKey) || catList[i - 1] || {};
+                    const prod = catList.find(p => p.id === i || p.dbKey === fixedKey) || {};
                     const dbKeyToUse = prod.dbKey || fixedKey;
-
                     const imageUrl = prod.image || '';
                     const previewSrc = imageUrl ? imageUrl : 'https://via.placeholder.com/45?text=No+Img';
 
