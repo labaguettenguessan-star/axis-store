@@ -512,16 +512,13 @@
 
         window.MERCHANT_NUMBER = "2250720648060"; 
         
-        // RECUPERATION DU PANIER DEPUIS LOCALSTORAGE
         window.cart = JSON.parse(localStorage.getItem('axis_cart')) || [];
         window.allProducts = [];
 
-        // ENREGISTREMENT LOCALSTORAGE
         window.saveCart = function() {
             localStorage.setItem('axis_cart', JSON.stringify(window.cart));
         };
 
-        // NOTIFICATION TOAST
         window.showToast = function(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -533,7 +530,6 @@
             setTimeout(() => floatBtn.classList.remove('bounce-anim'), 800);
         };
 
-        // ZOOM IMAGE (LIGHTBOX)
         window.openLightbox = function(src) {
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').classList.add('active');
@@ -542,7 +538,6 @@
             document.getElementById('lightbox').classList.remove('active');
         };
 
-        // OUVERTURE / FERMETURE DU PANIER
         window.toggleCart = function() {
             const cartDrawer = document.getElementById('cart-section');
             const cartOverlay = document.getElementById('cart-overlay');
@@ -602,7 +597,7 @@
                     chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
                     lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
                     sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
-                    montre: { brand: 'MONTRES', lbl1: 'Cadran :', lbl2: 'Bracelet :' }
+                    montre: { brand: 'MONTRES', lbl1: '', lbl2: 'Bracelet :' }
                 };
 
                 const config = configSection[catKey];
@@ -650,9 +645,10 @@
                         `;
                     } else if (catKey === 'montre') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
-                        opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
+                        opt1Html = '';
                         opt2Html = `
-                            <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
+                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
+                            <option value="Acier Inoxydable" data-extra="${suppAcier}">Acier Inoxydable (+${suppAcier} F)</option>
                         `;
                     }
 
@@ -673,10 +669,11 @@
                                 <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
                                 
                                 <div class="options-container">
+                                    ${config.lbl1 ? `
                                     <div class="option-group">
                                         <label for="size-${prodId}">${config.lbl1}</label>
                                         <select id="size-${prodId}" class="option-select">${opt1Html}</select>
-                                    </div>
+                                    </div>` : ''}
                                     <div class="option-group">
                                         <label for="quality-${prodId}">${config.lbl2}</label>
                                         <select id="quality-${prodId}" class="option-select" onchange="adjustPrice('${prodId}', ${basePrice})">${opt2Html}</select>
@@ -705,13 +702,12 @@
             const sizeEl = document.getElementById(`size-${productId}`);
             const qualityEl = document.getElementById(`quality-${productId}`);
             
-            const size = sizeEl ? sizeEl.value : 'Unique';
+            const size = sizeEl ? sizeEl.value : 'Standard';
             const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
             
             window.addToCart(name, originalPrice + extra, size, qualityLabel);
 
-            // Animation visuelle du bouton
             const btn = document.getElementById(`btn-add-${productId}`);
             if(btn) {
                 const origText = btn.innerText;
@@ -738,12 +734,30 @@
             window.showToast("Produit ajouté au panier !");
         };
 
+        window.changeQty = function(index, delta) {
+            if (window.cart[index]) {
+                window.cart[index].quantity += delta;
+                if (window.cart[index].quantity <= 0) {
+                    window.cart.splice(index, 1);
+                }
+                window.saveCart();
+                window.updateCartUI();
+            }
+        };
+
+        window.clearCart = function() {
+            window.cart = [];
+            window.saveCart();
+            window.updateCartUI();
+        };
+
         window.updateCartUI = function() {
             const cartItemsEl = document.getElementById('cart-items');
             const cartTotalEl = document.getElementById('cart-total');
             const cartCountEl = document.getElementById('cart-count');
             const cartCountNav = document.getElementById('cart-count-nav');
             const cartCountFloat = document.getElementById('cart-count-float');
+            const deliveryZoneEl = document.getElementById('delivery-zone');
 
             if (!cartItemsEl) return;
 
@@ -758,11 +772,13 @@
                     total += itemTotal;
                     count += item.quantity;
 
+                    const optionText = item.size !== 'Standard' ? `${item.size} | ${item.quality}` : item.quality;
+
                     return `
                         <div class="cart-item">
                             <div>
                                 <strong>${item.name}</strong>
-                                <span class="cart-item-meta">${item.size} | ${item.quality}</span>
+                                <span class="cart-item-meta">${optionText}</span>
                                 <div>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></div>
                             </div>
                             <div class="qty-controls">
@@ -775,30 +791,13 @@
                 }).join('');
             }
 
-            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || 0);
+            const deliveryFee = deliveryZoneEl ? parseInt(deliveryZoneEl.value) || 0 : 0;
             const grandTotal = total + deliveryFee;
 
             if (cartTotalEl) cartTotalEl.innerText = grandTotal.toLocaleString();
             if (cartCountEl) cartCountEl.innerText = count;
             if (cartCountNav) cartCountNav.innerText = count;
             if (cartCountFloat) cartCountFloat.innerText = count;
-        };
-
-        window.changeQty = function(idx, delta) {
-            if (window.cart[idx]) {
-                window.cart[idx].quantity += delta;
-                if (window.cart[idx].quantity <= 0) {
-                    window.cart.splice(idx, 1);
-                }
-                window.saveCart();
-                window.updateCartUI();
-            }
-        };
-
-        window.clearCart = function() {
-            window.cart = [];
-            window.saveCart();
-            window.updateCartUI();
         };
 
         window.sendOrder = function() {
@@ -809,39 +808,46 @@
 
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
-            const delivery = document.getElementById('client-delivery').value.trim();
-            const deliverySelect = document.getElementById('delivery-zone');
-            const deliveryZoneText = deliverySelect.options[deliverySelect.selectedIndex].text;
-            const deliveryFee = parseInt(deliverySelect.value);
+            const address = document.getElementById('client-delivery').value.trim();
+            const deliveryZoneEl = document.getElementById('delivery-zone');
+            const deliveryFee = parseInt(deliveryZoneEl.value) || 0;
+            const zoneText = deliveryZoneEl.options[deliveryZoneEl.selectedIndex].text;
             const payment = document.getElementById('payment-method').value;
 
-            if (!name || !phone || !delivery) {
+            if (!name || !phone || !address) {
                 alert("Veuillez remplir votre nom, téléphone et adresse de livraison.");
                 return;
             }
 
-            let text = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n`;
-            text += `👤 *Nom :* ${name}\n`;
-            text += `📞 *Téléphone :* ${phone}\n`;
-            text += `📍 *Adresse :* ${delivery}\n`;
-            text += `🚚 *Livraison :* ${deliveryZoneText}\n`;
-            text += `💳 *Paiement :* ${payment}\n\n`;
-            text += `📦 *PRODUITS :*\n`;
+            let subtotal = 0;
+            let itemsText = window.cart.map((item, i) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                const optionDisplay = item.size !== 'Standard' ? `${item.size} | ${item.quality}` : item.quality;
+                return `${i + 1}. *${item.name}*\n   - Option: ${optionDisplay}\n   - Quantité: ${item.quantity}\n   - Prix: ${itemTotal.toLocaleString()} FCFA`;
+            }).join('\n\n');
 
-            let itemsTotal = 0;
-            window.cart.forEach((item, i) => {
-                const sub = item.price * item.quantity;
-                itemsTotal += sub;
-                text += `${i+1}. ${item.name} (${item.size} / ${item.quality}) x${item.quantity} - ${sub.toLocaleString()} FCFA\n`;
-            });
+            const total = subtotal + deliveryFee;
 
-            const grandTotal = itemsTotal + deliveryFee;
-            text += `\n💰 *Total Produits :* ${itemsTotal.toLocaleString()} FCFA\n`;
-            if (deliveryFee > 0) text += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
-            text += `🔥 *TOTAL À PAYER :* ${grandTotal.toLocaleString()} FCFA`;
+            let message = `🛒 *NOUVELLE COMMANDE - AXIS STORE*\n`;
+            message += `-----------------------------------\n`;
+            message += `👤 *Nom:* ${name}\n`;
+            message += `📞 *Téléphone:* ${phone}\n`;
+            message += `📍 *Livraison:* ${address}\n`;
+            message += `🚚 *Zone:* ${zoneText}\n`;
+            message += `💳 *Paiement:* ${payment}\n`;
+            message += `-----------------------------------\n\n`;
+            message += `📦 *PRODUITS :*\n${itemsText}\n\n`;
+            message += `-----------------------------------\n`;
+            message += `Sous-total: ${subtotal.toLocaleString()} FCFA\n`;
+            if (deliveryFee > 0) {
+                message += `Frais de livraison: ${deliveryFee.toLocaleString()} FCFA\n`;
+            }
+            message += `💰 *TOTAL À PAYER:* ${total.toLocaleString()} FCFA`;
 
-            const url = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`;
+            window.open(waUrl, '_blank');
         };
     </script>
 </body>
