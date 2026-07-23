@@ -36,8 +36,45 @@
         nav ul { display: flex; list-style: none; gap: 25px; }
         nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
         nav a:hover { color: #39ff14; }
-        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: #fff; }
-        .logo span { color: #39ff14; }
+
+        /* LOGO AXIS STORE AVEC SYMBOLE CHRÉTIEN */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .cross-x {
+            position: relative;
+            color: #39ff14;
+            display: inline-block;
+            padding: 0 2px;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+        }
+
+        .cross-x::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 80%;
+            background-color: #39ff14;
+            box-shadow: 0 0 8px #39ff14;
+            border-radius: 2px;
+        }
+
+        .logo > span:last-child {
+            color: #39ff14;
+            margin-left: 5px;
+        }
 
         h1 { text-align: center; color: #39ff14; margin-bottom: 5px; font-weight: 800; }
         .subtitle { text-align: center; color: #888; margin-bottom: 25px; }
@@ -383,18 +420,18 @@
                 <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
             </ul>
         </nav>
-        <div class="logo">AXIS <span>STORE</span></div>
+        <div class="logo">A<span class="cross-x">X</span>IS <span>STORE</span></div>
     </header>
 
     <h1>NOTRE CATALOGUE</h1>
     <p class="subtitle">Revendeur officiel.</p>
 
     <div class="category-filter-bar">
-        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕Vêtements</button>
+        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Vêtements</button>
         <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
         <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
         <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
-        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Accessoires </button>
+        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Accessoires</button>
     </div>
 
     <div class="main-container">
@@ -421,7 +458,7 @@
             </section>
 
             <section id="sec-montre" class="section-block">
-                <h2 class="section-title">⌚ Collection Montres</h2>
+                <h2 class="section-title">⌚ Collection Accessoires</h2>
                 <div class="catalog-grid" id="grid-montre"></div>
             </section>
 
@@ -594,19 +631,19 @@
                 });
 
                 if (catKey === 'habit' && items.length === 0) {
-                    items = window.allProducts;
+                    items = window.allProducts.filter(p => !p.category || p.category === 'habit');
                 }
 
                 const configSection = {
-                    habit: { brand: 'STREETWEAR', lbl1: 'Taille :', lbl2: 'Qualité :' },
+                    habit: { brand: 'VÊTEMENTS', lbl1: 'Taille :', lbl2: 'Qualité :' },
                     chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
                     lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
                     sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
-                    montre: { brand: 'MONTRES', lbl1: 'Cadran :', lbl2: 'Bracelet :' }
+                    montre: { brand: 'ACCESSOIRES / MONTRES', lbl1: 'Cadran / Taille :', lbl2: 'Matière / Bracelet :' }
                 };
 
                 const config = configSection[catKey];
-                const displayCount = items.length > 0 ? items.length : 12;
+                const displayCount = items.length > 0 ? Math.min(items.length, 40) : 12;
 
                 for (let i = 0; i < displayCount; i++) {
                     const prod = items[i];
@@ -636,7 +673,7 @@
                         `;
                     } else if (catKey === 'lunette') {
                         const suppPola = prod ? (parseInt(prod.suppPolarise) || 0) : 0;
-                        opt1Html = `<option value="Unique">Unique</option>`;
+                        opt1Html = `<option value="Taille Unique">Taille Unique</option>`;
                         opt2Html = `
                             <option value="UV400" data-extra="0">UV400 (+0 F)</option>
                             <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
@@ -650,10 +687,11 @@
                         `;
                     } else if (catKey === 'montre') {
                         const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
-                        opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
+                        const cadrans = (prod && prod.sizes) ? prod.sizes.split(',') : ['Taille Unique', '40mm', '44mm'];
+                        opt1Html = cadrans.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('');
                         opt2Html = `
-                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
-                            <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
+                            <option value="Cuir / Standard" data-extra="0">Cuir / Standard (+0 F)</option>
+                            <option value="Acier Inox / Premium" data-extra="${suppAcier}">Acier Inox / Premium (+${suppAcier} F)</option>
                         `;
                     }
 
@@ -684,7 +722,7 @@
                                     </div>
                                 </div>
                                 <div class="action-buttons">
-                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER</button>
+                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice}, '${catKey}')">AJOUTER</button>
                                 </div>
                             </div>
                         </div>
@@ -702,17 +740,21 @@
             document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
         };
 
-        window.prepareAddToCart = function(productId, name, originalPrice) {
+        window.prepareAddToCart = function(productId, name, originalPrice, catKey) {
             const sizeEl = document.getElementById(`size-${productId}`);
             const qualityEl = document.getElementById(`quality-${productId}`);
             
-            const size = sizeEl ? sizeEl.value : 'Unique';
-            const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
+            let size = sizeEl ? sizeEl.value : 'Unique';
+            let qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
             const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
             
+            if (catKey === 'montre') {
+                size = `Cadran: ${size}`;
+                qualityLabel = `Matière: ${qualityLabel}`;
+            }
+
             window.addToCart(name, originalPrice + extra, size, qualityLabel);
 
-            // Animation visuelle du bouton
             const btn = document.getElementById(`btn-add-${productId}`);
             if(btn) {
                 const origText = btn.innerText;
@@ -737,6 +779,23 @@
             window.saveCart();
             window.updateCartUI();
             window.showToast("Produit ajouté au panier !");
+        };
+
+        window.changeQty = function(index, delta) {
+            if (window.cart[index]) {
+                window.cart[index].quantity += delta;
+                if (window.cart[index].quantity <= 0) {
+                    window.cart.splice(index, 1);
+                }
+                window.saveCart();
+                window.updateCartUI();
+            }
+        };
+
+        window.clearCart = function() {
+            window.cart = [];
+            window.saveCart();
+            window.updateCartUI();
         };
 
         window.updateCartUI = function() {
@@ -776,30 +835,13 @@
                 }).join('');
             }
 
-            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || 0);
-            const grandTotal = total + deliveryFee;
+            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || "0");
+            const finalTotal = total + (window.cart.length > 0 ? deliveryFee : 0);
 
-            if (cartTotalEl) cartTotalEl.innerText = grandTotal.toLocaleString();
-            if (cartCountEl) cartCountEl.innerText = count;
-            if (cartCountNav) cartCountNav.innerText = count;
-            if (cartCountFloat) cartCountFloat.innerText = count;
-        };
-
-        window.changeQty = function(idx, delta) {
-            if (window.cart[idx]) {
-                window.cart[idx].quantity += delta;
-                if (window.cart[idx].quantity <= 0) {
-                    window.cart.splice(idx, 1);
-                }
-                window.saveCart();
-                window.updateCartUI();
-            }
-        };
-
-        window.clearCart = function() {
-            window.cart = [];
-            window.saveCart();
-            window.updateCartUI();
+            cartTotalEl.innerText = finalTotal.toLocaleString();
+            cartCountEl.innerText = count;
+            if(cartCountNav) cartCountNav.innerText = count;
+            if(cartCountFloat) cartCountFloat.innerText = count;
         };
 
         window.sendOrder = function() {
@@ -811,38 +853,38 @@
             const name = document.getElementById('client-name').value.trim();
             const phone = document.getElementById('client-phone').value.trim();
             const delivery = document.getElementById('client-delivery').value.trim();
-            const deliverySelect = document.getElementById('delivery-zone');
-            const deliveryZoneText = deliverySelect.options[deliverySelect.selectedIndex].text;
-            const deliveryFee = parseInt(deliverySelect.value);
             const payment = document.getElementById('payment-method').value;
+            const deliveryFee = parseInt(document.getElementById('delivery-zone').value || "0");
 
             if (!name || !phone || !delivery) {
                 alert("Veuillez remplir votre nom, téléphone et adresse de livraison.");
                 return;
             }
 
-            let text = `🛒 *NOUVELLE COMMANDE AXIS STORE*\n\n`;
-            text += `👤 *Nom :* ${name}\n`;
-            text += `📞 *Téléphone :* ${phone}\n`;
-            text += `📍 *Adresse :* ${delivery}\n`;
-            text += `🚚 *Livraison :* ${deliveryZoneText}\n`;
-            text += `💳 *Paiement :* ${payment}\n\n`;
-            text += `📦 *PRODUITS :*\n`;
+            let summary = `🛍️ *NOUVELLE COMMANDE AXIS STORE*\n\n`;
+            summary += `👤 *Client :* ${name}\n`;
+            summary += `📞 *Tél :* ${phone}\n`;
+            summary += `📍 *Livraison :* ${delivery}\n`;
+            summary += `💳 *Paiement :* ${payment}\n\n`;
+            summary += `📦 *ARTICLES :*\n`;
 
-            let itemsTotal = 0;
+            let subtotal = 0;
             window.cart.forEach((item, i) => {
-                const sub = item.price * item.quantity;
-                itemsTotal += sub;
-                text += `${i+1}. ${item.name} (${item.size} / ${item.quality}) x${item.quantity} - ${sub.toLocaleString()} FCFA\n`;
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                summary += `${i+1}. *${item.name}* (${item.size} / ${item.quality})\n   Qty: ${item.quantity} x ${item.price.toLocaleString()} F = ${itemTotal.toLocaleString()} FCFA\n`;
             });
 
-            const grandTotal = itemsTotal + deliveryFee;
-            text += `\n💰 *Total Produits :* ${itemsTotal.toLocaleString()} FCFA\n`;
-            if (deliveryFee > 0) text += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
-            text += `🔥 *TOTAL À PAYER :* ${grandTotal.toLocaleString()} FCFA`;
+            const grandTotal = subtotal + deliveryFee;
 
-            const url = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
+            summary += `\n💵 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
+            summary += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
+            summary += `💰 *TOTAL À PAYER : ${grandTotal.toLocaleString()} FCFA*\n`;
+
+            const encodedMessage = encodeURIComponent(summary);
+            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
         };
     </script>
 </body>

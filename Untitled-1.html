@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue - AXIS STORE</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            line-height: 1.5; 
+            color: #111; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #0d0d0d; 
+            font-size: 16px;
+            padding-top: 90px;
+        }
+
+        /* HEADER & NAVIGATION */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #000000; 
+            color: #fff; 
+            padding: 15px 25px; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid #222;
+        }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { color: #fff; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; cursor: pointer; }
+        nav a:hover { color: #39ff14; }
+
+        /* LOGO AXIS STORE AVEC SYMBOLE CHRÉTIEN */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .cross-x {
+            position: relative;
+            color: #39ff14;
+            display: inline-block;
+            padding: 0 2px;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+        }
+
+        .cross-x::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 80%;
+            background-color: #39ff14;
+            box-shadow: 0 0 8px #39ff14;
+            border-radius: 2px;
+        }
+
+        .logo > span:last-child {
+            color: #39ff14;
+            margin-left: 5px;
+        }
+
+        h1 { text-align: center; color: #39ff14; margin-bottom: 5px; font-weight: 800; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 25px; }
+
+        /* FILTRES CATÉGORIES */
+        .category-filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .btn-cat-filter {
+            background: #181818;
+            color: #ccc;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .btn-cat-filter:hover, .btn-cat-filter.active {
+            background: #39ff14;
+            color: #000;
+            border-color: #39ff14;
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
+        }
+
+        .main-container { display: block; }
+
+        .section-block { display: none; margin-bottom: 40px; }
+        .section-block.active { display: block; }
+        .section-title {
+            color: #fff;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #39ff14;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .catalog-container { width: 100%; }
+        .catalog-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+        }
+        
+        .product-card { 
+            border: 1px solid #e5e7eb; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            background: #ffffff !important; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .image-container { 
+            position: relative; 
+            width: 100%; 
+            height: 260px; 
+            background: #f7f7f7; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .image-container img { 
+            max-width: 90%; 
+            max-height: 90%; 
+            object-fit: contain; 
+            transition: transform 0.3s ease;
+        }
+        .image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .badge-expert { 
+            position: absolute; 
+            top: 12px; 
+            left: 12px; 
+            background: #e67e22 !important; 
+            color: #ffffff !important; 
+            font-size: 0.75rem; 
+            padding: 4px 10px; 
+            border-radius: 4px; 
+            font-weight: 700;
+            text-transform: capitalize;
+            z-index: 5;
+            letter-spacing: 0.5px;
+        }
+
+        .product-info { 
+            padding: 16px; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            background: #ffffff !important;
+        }
+        
+        .brand { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            color: #888888 !important; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+        }
+        
+        .model-name { 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            color: #000000 !important; 
+            line-height: 1.25;
+            margin-top: -2px;
+        }
+        
+        .price { 
+            font-size: 1.35rem; 
+            font-weight: 800; 
+            color: #1a365d !important; 
+            margin-bottom: 2px;
+        }
+        
+        .expert-note { 
+            background: #f5f5f5 !important; 
+            padding: 10px 12px; 
+            border-left: 3px solid #000000 !important; 
+            font-size: 0.85rem; 
+            color: #555555 !important; 
+            border-radius: 0 4px 4px 0; 
+            line-height: 1.4;
+        }
+        .expert-note strong { color: #000000 !important; }
+        
+        .options-container { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .option-group { display: flex; flex-direction: column; gap: 4px; }
+        .option-group label { font-size: 0.82rem; font-weight: 700; color: #333333; }
+        
+        .option-select { 
+            padding: 9px 12px; 
+            border: 1px solid #e0e0e0 !important; 
+            border-radius: 6px; 
+            font-size: 0.9rem; 
+            background: #ffffff !important; 
+            color: #111111 !important;
+            width: 100%; 
+            cursor: pointer; 
+            outline: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        .btn-add { 
+            width: 100%;
+            text-align: center; 
+            background: #000000; 
+            color: #ffffff; 
+            border: none; 
+            padding: 12px 8px; 
+            border-radius: 6px; 
+            font-weight: 800; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            letter-spacing: 0.5px;
+        }
+        .btn-add:hover { background: #39ff14; color: #000000; }
+
+        /* BOUTON PANIER FLOTTANT */
+        .cart-toggle-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            padding: 15px 22px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(57, 255, 20, 0.5);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+        .cart-toggle-btn:hover { transform: scale(1.05); }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .cart-toggle-btn.bounce-anim {
+            animation: bounce 0.4s ease infinite alternate;
+        }
+
+        .cart-badge {
+            background: #000;
+            color: #39ff14;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-notification {
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            background: #39ff14;
+            color: #000;
+            font-weight: 800;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1005;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* PANNEAU PANIER FLOTTANT (DRAWER) */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1002;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        .cart-overlay.active { display: block; }
+
+        .cart-container { 
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            max-width: 90%;
+            height: 100%;
+            background: #ffffff; 
+            padding: 25px; 
+            box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+            z-index: 1003;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-container.open { right: 0; }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .cart-header h2 { font-size: 1.25rem; color: #000; margin: 0; }
+        .close-cart-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #000; }
+        .cart-item-meta { font-size: 0.78rem; color: #666; display: block; margin-top: 2px; }
+        .qty-controls { display: flex; align-items: center; gap: 6px; }
+        .qty-btn {
+            background: #eee;
+            border: 1px solid #ccc;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:hover { background: #ddd; }
+        
+        .cart-total { font-size: 1.2rem; font-weight: bold; margin-top: 15px; text-align: right; color: #000; }
+        
+        .form-group { margin-top: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; font-size: 0.82rem; font-weight: bold; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 6px; }
+
+        .cart-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-order { flex: 2; background: #25D366; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; text-decoration: none; }
+        .btn-cancel { flex: 1; background: #e74c3c; color: white; border: none; padding: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; border-radius: 6px; }
+
+        /* MODAL LIGHTBOX IMAGE */
+        .lightbox-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1005;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .lightbox-modal.active { display: flex; }
+        .lightbox-modal img { max-width: 90%; max-height: 85vh; border-radius: 8px; border: 2px solid #39ff14; }
+
+        footer { text-align: center; padding: 25px; margin-top: 40px; color: #666; border-top: 1px solid #222; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="axis-store acceuil.html">Accueil</a></li>
+                <li><a onclick="toggleCart()">🛒 Panier (<span id="cart-count-nav">0</span>)</a></li>
+                <li><a href="https://wa.me/2250720648060" target="_blank">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="logo">A<span class="cross-x">X</span>IS <span>STORE</span></div>
+    </header>
+
+    <h1>NOTRE CATALOGUE</h1>
+    <p class="subtitle">Revendeur officiel.</p>
+
+    <div class="category-filter-bar">
+        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Vêtements</button>
+        <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
+        <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
+        <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
+        <button class="btn-cat-filter" onclick="switchSection('montre', this)">⌚ Accessoires </button>
+    </div>
+
+    <div class="main-container">
+        <div class="catalog-container">
+            
+            <section id="sec-habit" class="section-block active">
+                <h2 class="section-title">👕 Collection Vêtements</h2>
+                <div class="catalog-grid" id="grid-habit"></div>
+            </section>
+
+            <section id="sec-chaussure" class="section-block">
+                <h2 class="section-title">👟 Collection Chaussures</h2>
+                <div class="catalog-grid" id="grid-chaussure"></div>
+            </section>
+
+            <section id="sec-lunette" class="section-block">
+                <h2 class="section-title">🕶️ Collection Lunettes</h2>
+                <div class="catalog-grid" id="grid-lunette"></div>
+            </section>
+
+            <section id="sec-sac" class="section-block">
+                <h2 class="section-title">🎒 Collection Sacs</h2>
+                <div class="catalog-grid" id="grid-sac"></div>
+            </section>
+
+            <section id="sec-montre" class="section-block">
+                <h2 class="section-title">⌚ Collection Montres</h2>
+                <div class="catalog-grid" id="grid-montre"></div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- BOUTON PANIER FLOTTANT -->
+    <button class="cart-toggle-btn" id="cart-float-btn" onclick="toggleCart()">
+        🛒 Panier <span class="cart-badge" id="cart-count-float">0</span>
+    </button>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-notification" id="toast">Produit ajouté au panier !</div>
+
+    <!-- OVERLAY OBSCURCISSEUR -->
+    <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+    <!-- LIGHTBOX IMAGE ZOOM -->
+    <div class="lightbox-modal" id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Zoom Image">
+    </div>
+
+    <!-- PANNEAU PANIER FLOTTANT -->
+    <div id="cart-section" class="cart-container">
+        <div class="cart-header">
+            <h2>Mon Panier (<span id="cart-count">0</span>)</h2>
+            <button class="close-cart-btn" onclick="toggleCart()">&times;</button>
+        </div>
+        
+        <div id="cart-items">
+            <p style="color: #888; font-style: italic;">Votre panier est vide.</p>
+        </div>
+        <div class="cart-total">Total: <span id="cart-total">0</span> FCFA</div>
+
+        <div class="form-group">
+            <label for="client-name">Votre Nom :</label>
+            <input type="text" id="client-name" placeholder="Ex: Jean Punk">
+        </div>
+        <div class="form-group">
+            <label for="client-phone">Numéro de Téléphone :</label>
+            <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
+        </div>
+        <div class="form-group">
+            <label for="delivery-zone">Zone de Livraison :</label>
+            <select id="delivery-zone" onchange="updateCartUI()">
+                <option value="950">Abidjan (950 F)</option>
+                <option value="0">Hors Abidjan / Intérieur du pays (À convenir avec le livreur)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="client-delivery">Adresse exacte / Lieu de rendez-vous :</label>
+            <input type="text" id="client-delivery" placeholder="Ex: Cocody Angré PétroIvoire / Gare de Yamoussoukro">
+        </div>
+        <div class="form-group">
+            <label for="payment-method">Moyen de paiement :</label>
+            <select id="payment-method">
+                <option value="Wave">Wave Mobile Money</option>
+                <option value="Espèces à la livraison">Espèces à la livraison</option>
+            </select>
+        </div>
+
+        <div class="cart-actions">
+            <button class="btn-cancel" onclick="clearCart()">Vider</button>
+            <button class="btn-order" onclick="sendOrder()">Commander via WA</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AXIS STORE. QUALITÉ ASSURÉE. BY PANDOR AGENCY</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8mFRkNYjYTF_g4AWttKrHccY9H-AWN54",
+            authDomain: "axis-store-829fb.firebaseapp.com",
+            databaseURL: "https://axis-store-829fb-default-rtdb.firebaseio.com/",
+            projectId: "axis-store-829fb",
+            storageBucket: "axis-store-829fb.firebasestorage.app",
+            messagingSenderId: "724482318031",
+            appId: "1:724482318031:web:c3448b95d73b4f0fade1ba"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.MERCHANT_NUMBER = "2250720648060"; 
+        
+        // RECUPERATION DU PANIER DEPUIS LOCALSTORAGE
+        window.cart = JSON.parse(localStorage.getItem('axis_cart')) || [];
+        window.allProducts = [];
+
+        // ENREGISTREMENT LOCALSTORAGE
+        window.saveCart = function() {
+            localStorage.setItem('axis_cart', JSON.stringify(window.cart));
+        };
+
+        // NOTIFICATION TOAST
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+
+            const floatBtn = document.getElementById('cart-float-btn');
+            floatBtn.classList.add('bounce-anim');
+            setTimeout(() => floatBtn.classList.remove('bounce-anim'), 800);
+        };
+
+        // ZOOM IMAGE (LIGHTBOX)
+        window.openLightbox = function(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        };
+        window.closeLightbox = function() {
+            document.getElementById('lightbox').classList.remove('active');
+        };
+
+        // OUVERTURE / FERMETURE DU PANIER
+        window.toggleCart = function() {
+            const cartDrawer = document.getElementById('cart-section');
+            const cartOverlay = document.getElementById('cart-overlay');
+            cartDrawer.classList.toggle('open');
+            cartOverlay.classList.toggle('active');
+        };
+
+        window.switchSection = function(catKey, btnElement) {
+            document.querySelectorAll('.section-block').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.btn-cat-filter').forEach(btn => btn.classList.remove('active'));
+            
+            const target = document.getElementById(`sec-${catKey}`);
+            if (target) target.classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
+        };
+
+        const productsRef = ref(db, 'products');
+        onValue(productsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                window.allProducts = [];
+            } else {
+                let keys = Object.keys(data).filter(key => data[key] !== null).reverse();
+                let items = keys.map(key => ({ id: key, ...data[key] }));
+
+                if (items.length > 0 && items[0].createdAt) {
+                    items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                } else if (items.length > 0 && items[0].order !== undefined) {
+                    items.sort((a, b) => (a.order || 0) - (b.order || 0));
+                }
+
+                window.allProducts = items;
+            }
+            renderAllGrids();
+            updateCartUI();
+        });
+
+        window.renderAllGrids = function() {
+            const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
+
+            sections.forEach(catKey => {
+                const container = document.getElementById(`grid-${catKey}`);
+                if (!container) return;
+                container.innerHTML = "";
+
+                let items = window.allProducts.filter(p => {
+                    const c = (p.category || p.section || '').toString().toLowerCase().trim();
+                    return c === catKey;
+                });
+
+                if (catKey === 'habit' && items.length === 0) {
+                    items = window.allProducts.filter(p => !p.category || p.category === 'habit');
+                }
+
+                const configSection = {
+                    habit: { brand: 'VÊTEMENTS', lbl1: 'Taille :', lbl2: 'Qualité :' },
+                    chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
+                    lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
+                    sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
+                    montre: { brand: 'MONTRES', lbl1: 'Cadran :', lbl2: 'Bracelet :' }
+                };
+
+                const config = configSection[catKey];
+                
+                // LIMITE À 40 ARTICLES MAX
+                const displayCount = items.length > 0 ? Math.min(items.length, 40) : 12;
+
+                for (let i = 0; i < displayCount; i++) {
+                    const prod = items[i];
+
+                    let opt1Html = '';
+                    let opt2Html = '';
+                    const basePrice = prod ? (parseInt(prod.price) || 0) : 15000;
+                    const prodId = prod ? (prod.id || `${catKey}-${i}`) : `${catKey}-demo-${i}`;
+                    const prodName = prod ? prod.name : `Produit ${config.brand} N°${i+1}`;
+
+                    if (catKey === 'habit') {
+                        const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['S', 'M', 'L', 'XL'];
+                        const sc = prod ? (parseInt(prod.suppCoton) || 0) : 0;
+                        const sn = prod ? (parseInt(prod.suppNylon) || 0) : 0;
+                        opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
+                        opt2Html = `
+                            <option value="Coton" data-extra="${sc}">Coton (+${sc} F)</option>
+                            <option value="Nylon" data-extra="${sn}">Nylon (+${sn} F)</option>
+                        `;
+                    } else if (catKey === 'chaussure') {
+                        const sizes = (prod && prod.sizes) ? prod.sizes.split(',') : ['39', '40', '41', '42', '43', '44'];
+                        const suppSema = prod ? (parseInt(prod.suppSemelle) || 0) : 0;
+                        opt1Html = sizes.map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('');
+                        opt2Html = `
+                            <option value="Standard" data-extra="0">Standard (+0 F)</option>
+                            <option value="Orthopédique" data-extra="${suppSema}">Orthopédique (+${suppSema} F)</option>
+                        `;
+                    } else if (catKey === 'lunette') {
+                        const suppPola = prod ? (parseInt(prod.suppPolarise) || 0) : 0;
+                        opt1Html = `<option value="Unique">Unique</option>`;
+                        opt2Html = `
+                            <option value="UV400" data-extra="0">UV400 (+0 F)</option>
+                            <option value="Polarisé" data-extra="${suppPola}">Polarisé (+${suppPola} F)</option>
+                        `;
+                    } else if (catKey === 'sac') {
+                        const suppCuir = prod ? (parseInt(prod.suppCuir) || 0) : 0;
+                        opt1Html = `<option value="Standard">Standard</option><option value="Grand Format">Grand Format</option>`;
+                        opt2Html = `
+                            <option value="Tissu" data-extra="0">Tissu (+0 F)</option>
+                            <option value="Cuir" data-extra="${suppCuir}">Cuir (+${suppCuir} F)</option>
+                        `;
+                    } else if (catKey === 'montre') {
+                        const suppAcier = prod ? (parseInt(prod.suppAcier) || 0) : 0;
+                        opt1Html = `<option value="40mm">40mm</option><option value="44mm">44mm</option>`;
+                        opt2Html = `
+                            <option value="Cuir" data-extra="0">Cuir (+0 F)</option>
+                            <option value="Acier Inox" data-extra="${suppAcier}">Acier Inox (+${suppAcier} F)</option>
+                        `;
+                    }
+
+                    const safeName = prodName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const displayImg = prod ? (prod.image || 'https://via.placeholder.com/260') : 'https://via.placeholder.com/260';
+                    const displayBadge = prod ? (prod.badge || 'Disponible') : 'Stock Limité';
+
+                    container.innerHTML += `
+                        <div class="product-card">
+                            <div class="image-container" onclick="openLightbox('${displayImg}')">
+                                <span class="badge-expert">${displayBadge}</span>
+                                <img src="${displayImg}" alt="${safeName}">
+                            </div>
+                            <div class="product-info">
+                                <span class="brand">${(prod && prod.category ? prod.category : config.brand).toUpperCase()}</span>
+                                <div class="model-name">${prodName}</div>
+                                <div class="price" id="display-price-${prodId}">${basePrice.toLocaleString()} FCFA</div>
+                                <div class="expert-note"><strong>Avis Revendeur :</strong> produit sélectionné par AXIS.</div>
+                                
+                                <div class="options-container">
+                                    <div class="option-group">
+                                        <label for="size-${prodId}">${config.lbl1}</label>
+                                        <select id="size-${prodId}" class="option-select">${opt1Html}</select>
+                                    </div>
+                                    <div class="option-group">
+                                        <label for="quality-${prodId}">${config.lbl2}</label>
+                                        <select id="quality-${prodId}" class="option-select" onchange="adjustPrice('${prodId}', ${basePrice})">${opt2Html}</select>
+                                    </div>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="btn-add" id="btn-add-${prodId}" onclick="prepareAddToCart('${prodId}', '${safeName}', ${basePrice})">AJOUTER</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        };
+
+        window.adjustPrice = function(productId, originalPrice) {
+            const qualityElement = document.getElementById(`quality-${productId}`);
+            if(!qualityElement) return;
+            const selectedOpt = qualityElement.options[qualityElement.selectedIndex];
+            const extra = parseInt(selectedOpt.getAttribute('data-extra')) || 0;
+            const finalPrice = originalPrice + extra;
+            document.getElementById(`display-price-${productId}`).innerText = `${finalPrice.toLocaleString()} FCFA`;
+        };
+
+        window.prepareAddToCart = function(productId, name, originalPrice) {
+            const sizeEl = document.getElementById(`size-${productId}`);
+            const qualityEl = document.getElementById(`quality-${productId}`);
+            
+            const size = sizeEl ? sizeEl.value : 'Unique';
+            const qualityLabel = qualityEl ? qualityEl.options[qualityEl.selectedIndex].text.split(' (')[0] : 'Standard';
+            const extra = qualityEl ? (parseInt(qualityEl.options[qualityEl.selectedIndex].getAttribute('data-extra')) || 0) : 0;
+            
+            window.addToCart(name, originalPrice + extra, size, qualityLabel);
+
+            // Animation visuelle du bouton
+            const btn = document.getElementById(`btn-add-${productId}`);
+            if(btn) {
+                const origText = btn.innerText;
+                btn.innerText = "AJOUTÉ ! ✔️";
+                btn.style.background = "#39ff14";
+                btn.style.color = "#000";
+                setTimeout(() => {
+                    btn.innerText = origText;
+                    btn.style.background = "#000";
+                    btn.style.color = "#fff";
+                }, 1500);
+            }
+        };
+
+        window.addToCart = function(name, price, size, quality) {
+            const existingItem = window.cart.find(item => item.name === name && item.size === size && item.quality === quality);
+            if (existingItem) { 
+                existingItem.quantity += 1; 
+            } else { 
+                window.cart.push({ name, price, size, quality, quantity: 1 }); 
+            }
+            window.saveCart();
+            window.updateCartUI();
+            window.showToast("Produit ajouté au panier !");
+        };
+
+        window.changeQty = function(index, delta) {
+            if (window.cart[index]) {
+                window.cart[index].quantity += delta;
+                if (window.cart[index].quantity <= 0) {
+                    window.cart.splice(index, 1);
+                }
+                window.saveCart();
+                window.updateCartUI();
+            }
+        };
+
+        window.clearCart = function() {
+            window.cart = [];
+            window.saveCart();
+            window.updateCartUI();
+        };
+
+        window.updateCartUI = function() {
+            const cartItemsEl = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const cartCountEl = document.getElementById('cart-count');
+            const cartCountNav = document.getElementById('cart-count-nav');
+            const cartCountFloat = document.getElementById('cart-count-float');
+
+            if (!cartItemsEl) return;
+
+            let total = 0;
+            let count = 0;
+
+            if (window.cart.length === 0) {
+                cartItemsEl.innerHTML = '<p style="color: #888; font-style: italic;">Votre panier est vide.</p>';
+            } else {
+                cartItemsEl.innerHTML = window.cart.map((item, idx) => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    count += item.quantity;
+
+                    return `
+                        <div class="cart-item">
+                            <div>
+                                <strong>${item.name}</strong>
+                                <span class="cart-item-meta">${item.size} | ${item.quality}</span>
+                                <div>${item.price.toLocaleString()} FCFA x ${item.quantity} = <strong>${itemTotal.toLocaleString()} FCFA</strong></div>
+                            </div>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="changeQty(${idx}, -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const deliveryFee = parseInt(document.getElementById('delivery-zone')?.value || "0");
+            const finalTotal = total + (window.cart.length > 0 ? deliveryFee : 0);
+
+            cartTotalEl.innerText = finalTotal.toLocaleString();
+            cartCountEl.innerText = count;
+            if(cartCountNav) cartCountNav.innerText = count;
+            if(cartCountFloat) cartCountFloat.innerText = count;
+        };
+
+        window.sendOrder = function() {
+            if (window.cart.length === 0) {
+                alert("Votre panier est vide !");
+                return;
+            }
+
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
+            const delivery = document.getElementById('client-delivery').value.trim();
+            const payment = document.getElementById('payment-method').value;
+            const deliveryFee = parseInt(document.getElementById('delivery-zone').value || "0");
+
+            if (!name || !phone || !delivery) {
+                alert("Veuillez remplir votre nom, téléphone et adresse de livraison.");
+                return;
+            }
+
+            let summary = `🛍️ *NOUVELLE COMMANDE AXIS STORE*\n\n`;
+            summary += `👤 *Client :* ${name}\n`;
+            summary += `📞 *Tél :* ${phone}\n`;
+            summary += `📍 *Livraison :* ${delivery}\n`;
+            summary += `💳 *Paiement :* ${payment}\n\n`;
+            summary += `📦 *ARTICLES :*\n`;
+
+            let subtotal = 0;
+            window.cart.forEach((item, i) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                summary += `${i+1}. *${item.name}* (${item.size} / ${item.quality})\n   Qty: ${item.quantity} x ${item.price.toLocaleString()} F = ${itemTotal.toLocaleString()} FCFA\n`;
+            });
+
+            const grandTotal = subtotal + deliveryFee;
+
+            summary += `\n💵 *Sous-total :* ${subtotal.toLocaleString()} FCFA\n`;
+            summary += `🚚 *Frais Livraison :* ${deliveryFee.toLocaleString()} FCFA\n`;
+            summary += `💰 *TOTAL À PAYER : ${grandTotal.toLocaleString()} FCFA*\n`;
+
+            const encodedMessage = encodeURIComponent(summary);
+            const whatsappUrl = `https://wa.me/${window.MERCHANT_NUMBER}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
+        };
+    </script>
+</body>
+</html>
