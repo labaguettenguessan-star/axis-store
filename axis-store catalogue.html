@@ -390,7 +390,7 @@
     <p class="subtitle">Revendeur officiel.</p>
 
     <div class="category-filter-bar">
-        <button class="btn-cat-filter active" onclick="switchSection('vetement', this)">👕 Habits</button>
+        <button class="btn-cat-filter active" onclick="switchSection('habit', this)">👕 Habits</button>
         <button class="btn-cat-filter" onclick="switchSection('chaussure', this)">👟 Chaussures</button>
         <button class="btn-cat-filter" onclick="switchSection('lunette', this)">🕶️ Lunettes</button>
         <button class="btn-cat-filter" onclick="switchSection('sac', this)">🎒 Sacs</button>
@@ -400,8 +400,8 @@
     <div class="main-container">
         <div class="catalog-container">
             
-            <section id="sec-vetement" class="section-block active">
-                <h2 class="section-title">👕 Collection vetement</h2>
+            <section id="sec-habit" class="section-block active">
+                <h2 class="section-title">👕 Collection Habits</h2>
                 <div class="catalog-grid" id="grid-habit"></div>
             </section>
 
@@ -462,13 +462,13 @@
         </div>
         <div class="form-group">
             <label for="client-phone">Numéro de Téléphone :</label>
-            <input type="tel" id="client-phone" placeholder="Ex: 0755555588">
+            <input type="tel" id="client-phone" placeholder="Ex: 0720648060">
         </div>
         <div class="form-group">
             <label for="delivery-zone">Zone de Livraison :</label>
             <select id="delivery-zone" onchange="updateCartUI()">
                 <option value="950">Abidjan (950 F)</option>
-                <option value="0">Hors Abidjan / Intérieur du pays (À convenir avec le livreur OU LE MARCHAND)</option>
+                <option value="0">Hors Abidjan / Intérieur du pays (À convenir avec le livreur)</option>
             </select>
         </div>
         <div class="form-group">
@@ -484,8 +484,8 @@
         </div>
 
         <div class="cart-actions">
-            <button class="btn-cancel" onclick="clearCart()">VIDER</button>
-            <button class="btn-order" onclick="sendOrder()">COMMDANDER</button>
+            <button class="btn-cancel" onclick="clearCart()">Vider</button>
+            <button class="btn-order" onclick="sendOrder()">Commander via WA</button>
         </div>
     </div>
 
@@ -581,7 +581,7 @@
         });
 
         window.renderAllGrids = function() {
-            const sections = ['vetement', 'chaussure', 'lunette', 'sac', 'montre'];
+            const sections = ['habit', 'chaussure', 'lunette', 'sac', 'montre'];
 
             sections.forEach(catKey => {
                 const container = document.getElementById(`grid-${catKey}`);
@@ -598,7 +598,7 @@
                 }
 
                 const configSection = {
-                    vetement: { brand: 'STREETWEAR', lbl1: 'Taille :', lbl2: 'Qualité :' },
+                    habit: { brand: 'STREETWEAR', lbl1: 'Taille :', lbl2: 'Qualité :' },
                     chaussure: { brand: 'CHAUSSURES', lbl1: 'Pointure :', lbl2: 'Semelle :' },
                     lunette: { brand: 'LUNETTES', lbl1: 'Monture :', lbl2: 'Verres :' },
                     sac: { brand: 'SACS', lbl1: 'Format :', lbl2: 'Finition :' },
